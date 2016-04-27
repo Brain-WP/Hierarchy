@@ -13,9 +13,10 @@ namespace Brain\Hierarchy\Finder;
 use ArrayIterator;
 
 /**
- * Very similar the way WordPress core works, however, it allows to search templates arbitrary
- * folders and to use a custom file extension (default to php). By default, stylesheet and template
- * folders and file extension to php, so it acts exactly like core.
+ * Very similar to the way WordPress core works, however, it allows to search
+ * templates within arbitrary folders and to use one or more custom file
+ * extensions. By default, it looks through stylesheet and template folders and
+ * allows file extension to be php, so it acts exactly like core.
  *
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
@@ -31,13 +32,13 @@ final class FoldersTemplateFinder implements TemplateFinderInterface
     private $folders;
 
     /**
-     * @var string
+     * @var string|array
      */
-    private $extension;
+    private $extensions;
 
     /**
-     * @param array  $folders
-     * @param string $extension
+     * @param array        $folders
+     * @param string|array $extension
      */
     public function __construct(array $folders = [], $extension = 'php')
     {
@@ -49,7 +50,7 @@ final class FoldersTemplateFinder implements TemplateFinderInterface
         }
 
         $this->folders = array_map('trailingslashit', $folders);
-        $this->extension = $extension;
+        $this->extensions = (array) $extension;
     }
 
     /**
@@ -58,8 +59,10 @@ final class FoldersTemplateFinder implements TemplateFinderInterface
     public function find($template, $type)
     {
         foreach ($this->folders as $folder) {
-            if (file_exists($folder.$template.'.'.$this->extension)) {
-                return $folder.$template.'.'.$this->extension;
+            foreach ($this->extensions as $extension) {
+                if (file_exists($folder.$template.'.'.$extension)) {
+                    return $folder.$template.'.'.$extension;
+                }
             }
         }
 
