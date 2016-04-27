@@ -257,15 +257,23 @@ add_action( 'template_redirect', function() {
 The snippet above will search for templates in the current folder and if template is not found there,
 it is searched in theme and parent theme folders.
 
-##### Custom file extension
+##### Custom file extensions
 
-`FoldersTemplateFinder` class, by default, searches for files with `.php` extension, but is possible to 
-use a different files extension, passing it as second constructor argument:
+`FoldersTemplateFinder` class, by default, searches for files with `.php` extension, but it is possible to
+use different file extensions, by passing them as a second constructor argument (either a string or an array of strings):
 
 ```php
-$finder = \Brain\Hierarchy\Finder\FoldersTemplateFinder(
+// This will look for *.phtml files.
+$phtml_finder = \Brain\Hierarchy\Finder\FoldersTemplateFinder(
     [ get_stylesheet_directory(), get_template_directory() ],
     '.phtml'
+);
+
+// This will look for Twig files first, and fall back to standard PHP files if
+// no matching Twig file was found.
+$twig_finder = \Brain\Hierarchy\Finder\FoldersTemplateFinder(
+    [ get_stylesheet_directory(), get_template_directory() ],
+    [ '.twig', 'php' ]
 );
 ```
 
@@ -293,7 +301,7 @@ Using code above the templates are searched, in order, in:
  - /path/to/child/theme/
  - /path/to/parent/theme/
  
-`SubfolderTemplateFinder`, just like `FoldersTemplateFinder`, accepts a custom file extension as second 
+`SubfolderTemplateFinder`, just like `FoldersTemplateFinder`, accepts custom file extensions as second
 constructor argument.
  
 
