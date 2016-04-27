@@ -11,8 +11,9 @@
 namespace Brain\Hierarchy\Finder;
 
 /**
- * Very similar the way WordPress core works, however, it allows to search templates in a subfolder
- * (for both parent and child themes) and to use a custom file extension (default to php).
+ * Very similar to the way WordPress core works, however, it allows to search
+ * templates in a subfolder (for both parent and child themes) and to use one or
+ * more custom file extensions (defaults to php).
  *
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
@@ -26,8 +27,8 @@ final class SubfolderTemplateFinder implements TemplateFinderInterface
     private $finder;
 
     /**
-     * @param string $subfolder
-     * @param string $extension
+     * @param string       $subfolder
+     * @param string|array $extension
      */
     public function __construct($subfolder, $extension = 'php')
     {

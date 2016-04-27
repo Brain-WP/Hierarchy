@@ -54,4 +54,18 @@ final class SubfolderTemplateFinderTest extends TestCase
 
         assertSame($template, $finder->findFirst(['page-foo', 'another', 'index'], 'page'));
     }
+
+    public function testFindSeveralExtensionsTwig()
+    {
+        $twigTemplate     = getenv('HIERARCHY_TESTS_BASEPATH').'/files/singular.twig';
+        $phpTemplate      = getenv('HIERARCHY_TESTS_BASEPATH').'/files/singular.php';
+        $fallbackTemplate = getenv('HIERARCHY_TESTS_BASEPATH').'/files/single.php';
+
+        $twigFinder = new SubfolderTemplateFinder('files', ['twig', 'php']);
+        $phpFinder  = new SubfolderTemplateFinder('files', ['php', 'twig']);
+
+        assertSame($twigTemplate, $twigFinder->find('singular', 'singular'));
+        assertSame($phpTemplate, $phpFinder->find('singular', 'singular'));
+        assertSame($fallbackTemplate, $twigFinder->find('single', 'single'));
+    }
 }
