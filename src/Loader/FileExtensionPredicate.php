@@ -10,6 +10,8 @@
 
 namespace Brain\Hierarchy\Loader;
 
+use Brain\Hierarchy\Finder\ExtensionParserTrait;
+
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
@@ -17,6 +19,8 @@ namespace Brain\Hierarchy\Loader;
  */
 class FileExtensionPredicate
 {
+    use ExtensionParserTrait;
+
     /**
      * @var string[]
      */
@@ -27,10 +31,7 @@ class FileExtensionPredicate
      */
     public function __construct($extension)
     {
-        $extensions = is_string($extension) ? explode('|', $extension) : (array) $extension;
-        foreach ($extensions as $extension) {
-            is_string($extension) and $this->extension[] = strtolower(trim($extension, ". \t\n\r\0\x0B"));
-        }
+        $this->extension = $this->parseExtensions($extension);
     }
 
     /**

@@ -25,6 +25,7 @@ use ArrayIterator;
 final class FoldersTemplateFinder implements TemplateFinderInterface
 {
     use FindFirstTemplateTrait;
+    use ExtensionParserTrait;
 
     /**
      * @var \ArrayIterator
@@ -68,23 +69,5 @@ final class FoldersTemplateFinder implements TemplateFinderInterface
         }
 
         return '';
-    }
-
-    /**
-     * @param string|string[] $extensions
-     * @return string[]
-     */
-    private function parseExtensions($extensions)
-    {
-        $parsed = [];
-        $extensions = is_string($extensions) ? explode('|', $extensions) : (array) $extensions;
-        foreach ($extensions as $extension) {
-            if (is_string($extension)) {
-                $extension = strtolower(trim($extension, ". \t\n\r\0\x0B"));
-                in_array($extension, $parsed, true) or $parsed[] = $extension;
-            }
-        }
-
-        return $parsed;
     }
 }
