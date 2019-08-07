@@ -50,7 +50,7 @@ final class BranchPostTypeArchive implements BranchInterface
     private function postType(\WP_Query $query)
     {
         $type = $query->get('post_type');
-        is_array($type) and $type = reset($post_type);
+        is_array($type) and $type = reset($type);
 
         $object = get_post_type_object($type);
         (is_object($object) && $object->has_archive) or $type = '';
