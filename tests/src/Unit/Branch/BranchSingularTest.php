@@ -25,6 +25,6 @@ final class BranchSingularTest extends TestCase
 
         $branch = new BranchSingular();
 
-        assertSame(['singular'], $branch->leaves($query));
+        static::assertSame(['singular'], $branch->leaves($query));
     }
 }

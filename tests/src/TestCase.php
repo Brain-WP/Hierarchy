@@ -24,15 +24,12 @@ class TestCase extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        Monkey::setUpWP();
-        Monkey\Functions::when('trailingslashit')->alias(function ($str) {
-            return rtrim($str, '\\/').'/';
-        });
+        Monkey\setUp();
     }
 
     protected function tearDown()
     {
-        Monkey::tearDownWP();
+        Monkey\tearDown();
         parent::tearDown();
     }
 
@@ -80,6 +77,8 @@ class TestCase extends PHPUnit_Framework_TestCase
      */
     protected function callPrivateFunc($method, $object, $args = [])
     {
-        return call_user_func_array([new Proxy($object), $method], $args);
+        $callback = [new Proxy($object), $method];
+
+        return $callback(...$args);
     }
 }

@@ -15,7 +15,6 @@ if (!realpath($vendor)) {
 }
 
 require_once $vendor.'antecedent/patchwork/Patchwork.php';
-require_once $vendor.'phpunit/phpunit/src/Framework/Assert/Functions.php';
 require_once $vendor.'autoload.php';
 unset($vendor);
 

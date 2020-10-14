@@ -23,10 +23,10 @@ final class SubfolderTemplateFinderTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        Functions::when('get_stylesheet_directory')->alias(function () {
+        Functions\when('get_stylesheet_directory')->alias(function () {
             return getenv('HIERARCHY_TESTS_BASEPATH');
         });
-        Functions::when('get_template_directory')->alias(function () {
+        Functions\when('get_template_directory')->alias(function () {
             return getenv('HIERARCHY_TESTS_BASEPATH');
         });
     }
@@ -35,7 +35,7 @@ final class SubfolderTemplateFinderTest extends TestCase
     {
         $finder = new SubfolderTemplateFinder('files');
 
-        assertSame('', $finder->find('foo', 'foo'));
+        static::assertSame('', $finder->find('foo', 'foo'));
     }
 
     public function testFind()
@@ -43,7 +43,7 @@ final class SubfolderTemplateFinderTest extends TestCase
         $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/index.php';
         $finder = new SubfolderTemplateFinder('files');
 
-        assertSame($template, $finder->find('index', 'index'));
+        static::assertSame($template, $finder->find('index', 'index'));
     }
 
     public function testFindFirst()
@@ -51,7 +51,7 @@ final class SubfolderTemplateFinderTest extends TestCase
         $finder = new SubfolderTemplateFinder('files');
         $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/another.php';
 
-        assertSame($template, $finder->findFirst(['page-foo', 'another', 'index'], 'page'));
+        static::assertSame($template, $finder->findFirst(['page-foo', 'another', 'index'], 'page'));
     }
 
     public function testFindSeveralExtensions()
@@ -61,8 +61,8 @@ final class SubfolderTemplateFinderTest extends TestCase
         $fallbackTemplate = getenv('HIERARCHY_TESTS_BASEPATH').'/files/single.php';
         $twigFinder = new SubfolderTemplateFinder('files', ['twig', 'php']);
         $phpFinder = new SubfolderTemplateFinder('files', ['php', 'twig']);
-        assertSame($twigTemplate, $twigFinder->find('singular', 'singular'));
-        assertSame($phpTemplate, $phpFinder->find('singular', 'singular'));
-        assertSame($fallbackTemplate, $twigFinder->find('single', 'single'));
+        static::assertSame($twigTemplate, $twigFinder->find('singular', 'singular'));
+        static::assertSame($phpTemplate, $phpFinder->find('singular', 'singular'));
+        static::assertSame($fallbackTemplate, $twigFinder->find('single', 'single'));
     }
 }

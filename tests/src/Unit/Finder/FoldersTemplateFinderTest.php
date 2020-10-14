@@ -24,7 +24,7 @@ final class FoldersTemplateFinderTest extends TestCase
         $folders = [getenv('HIERARCHY_TESTS_BASEPATH').'/files'];
         $finder = new FoldersTemplateFinder($folders);
 
-        assertSame('', $finder->find('foo', 'foo'));
+        static::assertSame('', $finder->find('foo', 'foo'));
     }
 
     public function testFind()
@@ -34,7 +34,7 @@ final class FoldersTemplateFinderTest extends TestCase
         $folders = [getenv('HIERARCHY_TESTS_BASEPATH').'/files'];
         $finder = new FoldersTemplateFinder($folders);
 
-        assertSame($template, $finder->find('index', 'index'));
+        static::assertSame($template, $finder->find('index', 'index'));
     }
 
     public function testFindFirst()
@@ -44,7 +44,7 @@ final class FoldersTemplateFinderTest extends TestCase
 
         $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/another.php';
 
-        assertSame($template, $finder->findFirst(['page-foo', 'another', 'index'], 'page'));
+        static::assertSame($template, $finder->findFirst(['page-foo', 'another', 'index'], 'page'));
     }
 
     public function testFindSeveralExtensions()
@@ -57,9 +57,9 @@ final class FoldersTemplateFinderTest extends TestCase
         $twigFinder = new FoldersTemplateFinder($folders, [' TWIG ', 'php']);
         $phpFinder = new FoldersTemplateFinder($folders, ['.php', 'twig']);
 
-        assertSame($twigTemplate, $twigFinder->find('singular', 'singular'));
-        assertSame($phpTemplate, $phpFinder->find('singular', 'singular'));
-        assertSame($fallbackTemplate, $twigFinder->find('single', 'single'));
+        static::assertSame($twigTemplate, $twigFinder->find('singular', 'singular'));
+        static::assertSame($phpTemplate, $phpFinder->find('singular', 'singular'));
+        static::assertSame($fallbackTemplate, $twigFinder->find('single', 'single'));
     }
 
     public function testFindExtensionless()
@@ -69,6 +69,6 @@ final class FoldersTemplateFinderTest extends TestCase
         $folders = [getenv('HIERARCHY_TESTS_BASEPATH').'/files'];
         $finder = new FoldersTemplateFinder($folders, '');
 
-        assertSame($template, $finder->find('archive', 'archive'));
+        static::assertSame($template, $finder->find('archive', 'archive'));
     }
 }

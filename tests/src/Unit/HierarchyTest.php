@@ -14,7 +14,7 @@ use Brain\Hierarchy\Tests\TestCase;
 use Brain\Hierarchy\Tests\Stubs;
 use Brain\Hierarchy\Branch\BranchInterface;
 use Brain\Hierarchy\Hierarchy;
-use Brain\Monkey\WP\Filters;
+use Brain\Monkey\Filters;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
@@ -35,7 +35,7 @@ class HierarchyTest extends TestCase
             Stubs\BranchStubBaz::class,  // should be skipped because its is() always returns false
         ];
 
-        Filters::expectApplied('brain.hierarchy.branches')->once()->andReturn($branches);
+        Filters\expectApplied('brain.hierarchy.branches')->once()->andReturn($branches);
 
         $query = new \WP_Query();
 
@@ -55,9 +55,9 @@ class HierarchyTest extends TestCase
             'index',
         ];
 
-        assertInstanceOf(\stdClass::class, $data);
-        assertSame($expected, $data->hierarchy);
-        assertSame($expectedFlat, $data->templates);
+        static::assertInstanceOf(\stdClass::class, $data);
+        static::assertSame($expected, $data->hierarchy);
+        static::assertSame($expectedFlat, $data->templates);
     }
 
     public function testBranches()
@@ -66,17 +66,17 @@ class HierarchyTest extends TestCase
         $classes = $this->getPrivateStaticVar('branches', $hierarchy);
 
         foreach ($classes as $class) {
-            assertInstanceOf(BranchInterface::class, new $class());
+            static::assertInstanceOf(BranchInterface::class, new $class());
         }
     }
 
     public function testGetHierarchy()
     {
-        assertSame(['index' => ['index']], (new Hierarchy())->getHierarchy(new \WP_Query()));
+        static::assertSame(['index' => ['index']], (new Hierarchy())->getHierarchy(new \WP_Query()));
     }
 
     public function testGetTemplates()
     {
-        assertSame(['index'], (new Hierarchy())->getTemplates(new \WP_Query()));
+        static::assertSame(['index'], (new Hierarchy())->getTemplates(new \WP_Query()));
     }
 }

@@ -5,18 +5,14 @@ php:
   - 7.0
   - 7.1
   - 7.2
-
-matrix:
-  include:
-    - php: 5.5
-      dist: trusty
+  - 7.3
 
 before_script:
   - composer install
 
 script:
   - mkdir -p build/logs
-  - php vendor/bin/phpunit -c phpunit.xml.dist
+  - php vendor/bin/phpunit
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

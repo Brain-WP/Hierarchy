@@ -26,12 +26,14 @@ final class BranchPostTypeArchiveTest extends TestCase
         $query = Mockery::mock('\WP_Query');
         $query->shouldReceive('is_post_type_archive')->andReturn(true);
         $query->shouldReceive('get')->with('post_type')->andReturn('my_cpt');
-        Functions::expect('get_post_type_object')->with('my_cpt')->andReturn((object) ['has_archive' => true]);
+        Functions\expect('get_post_type_object')
+            ->with('my_cpt')
+            ->andReturn((object) ['has_archive' => true]);
 
         $branch = new BranchPostTypeArchive();
 
-        assertTrue($branch->is($query));
-        assertSame(['archive-my_cpt', 'archive'], $branch->leaves($query));
+        static::assertTrue($branch->is($query));
+        static::assertSame(['archive-my_cpt', 'archive'], $branch->leaves($query));
     }
 
     public function testLeavesWithNoArchiveCpt()
@@ -39,11 +41,13 @@ final class BranchPostTypeArchiveTest extends TestCase
         $query = Mockery::mock('\WP_Query');
         $query->shouldReceive('is_post_type_archive')->andReturn(true);
         $query->shouldReceive('get')->with('post_type')->andReturn('my_cpt');
-        Functions::expect('get_post_type_object')->with('my_cpt')->andReturn((object) ['has_archive' => false]);
+        Functions\expect('get_post_type_object')
+            ->with('my_cpt')
+            ->andReturn((object) ['has_archive' => false]);
 
         $branch = new BranchPostTypeArchive();
 
-        assertFalse($branch->is($query));
-        assertSame(['archive'], $branch->leaves($query));
+        static::assertFalse($branch->is($query));
+        static::assertSame(['archive'], $branch->leaves($query));
     }
 }

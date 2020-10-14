@@ -24,19 +24,19 @@ final class CallbackTemplateFinderTest extends TestCase
         $finder = new CallbackTemplateFinder(function () {
             return '';
         });
-        assertSame('', $finder->find('index', 'index'));
+        static::assertSame('', $finder->find('index', 'index'));
     }
 
     public function testFind()
     {
         $path = getenv('HIERARCHY_TESTS_BASEPATH').'/files/';
         $finder = new CallbackTemplateFinder(function ($name, $type) use ($path) {
-            assertSame('index', $type);
+            static::assertSame('index', $type);
 
             return "{$path}{$name}.php";
         });
 
-        assertSame("{$path}index.php", $finder->find('index', 'index'));
+        static::assertSame("{$path}index.php", $finder->find('index', 'index'));
     }
 
     public function testFindFirst()
@@ -45,11 +45,11 @@ final class CallbackTemplateFinderTest extends TestCase
         $finder = new CallbackTemplateFinder(function (array $names, $type) use ($path) {
             $name = array_pop($names);
 
-            assertSame('page', $type);
+            static::assertSame('page', $type);
 
             return "{$path}{$name}.php";
         });
 
-        assertSame("{$path}another.php", $finder->find(['page', 'another'], 'page'));
+        static::assertSame("{$path}another.php", $finder->find(['page', 'another'], 'page'));
     }
 }

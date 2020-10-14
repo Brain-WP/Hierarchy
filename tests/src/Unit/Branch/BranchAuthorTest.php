@@ -25,7 +25,7 @@ final class BranchAuthorTest extends TestCase
         $branch = new BranchAuthor();
         $query = new \WP_Query([], null);
 
-        assertSame(['author'], $branch->leaves($query));
+        static::assertSame(['author'], $branch->leaves($query));
     }
 
     public function testLeaves()
@@ -37,6 +37,6 @@ final class BranchAuthorTest extends TestCase
 
         $branch = new BranchAuthor();
 
-        assertSame(['author-john_doe', 'author-12', 'author'], $branch->leaves($query));
+        static::assertSame(['author-john_doe', 'author-12', 'author'], $branch->leaves($query));
     }
 }

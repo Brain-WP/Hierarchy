@@ -24,7 +24,7 @@ final class BranchCategoryTest extends TestCase
         $query = new \WP_Query([], null);
         $branch = new BranchCategory();
 
-        assertSame(['category'], $branch->leaves($query));
+        static::assertSame(['category'], $branch->leaves($query));
     }
 
     public function testLeaves()
@@ -34,6 +34,6 @@ final class BranchCategoryTest extends TestCase
 
         $branch = new BranchCategory();
 
-        assertSame(['category-foo', 'category-123', 'category'], $branch->leaves($query));
+        static::assertSame(['category-foo', 'category-123', 'category'], $branch->leaves($query));
     }
 }

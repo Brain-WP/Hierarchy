@@ -35,8 +35,8 @@ class ExtensionMapTemplateLoaderTest extends TestCase
             'twig' => $bLoader,
         ]);
 
-        assertSame('php!', $loader->load($path.'singular.php'));
-        assertSame('twig!', $loader->load($path.'singular.twig'));
+        static::assertSame('php!', $loader->load($path.'singular.php'));
+        static::assertSame('twig!', $loader->load($path.'singular.twig'));
     }
 
     public function testLoadWithFactories()
@@ -58,7 +58,7 @@ class ExtensionMapTemplateLoaderTest extends TestCase
             },
         ]);
 
-        assertSame('php!', $loader->load($path.'singular.php'));
-        assertSame('twig!', $loader->load($path.'singular.twig'));
+        static::assertSame('php!', $loader->load($path.'singular.php'));
+        static::assertSame('twig!', $loader->load($path.'singular.twig'));
     }
 }

@@ -24,7 +24,7 @@ final class BranchTaxonomyTest extends TestCase
         $query = new \WP_Query([]);
         $branch = new BranchTaxonomy();
 
-        assertSame(['taxonomy'], $branch->leaves($query));
+        static::assertSame(['taxonomy'], $branch->leaves($query));
     }
 
     public function testLeaves()
@@ -34,6 +34,6 @@ final class BranchTaxonomyTest extends TestCase
 
         $branch = new BranchTaxonomy();
         $expected = ['taxonomy-custom-tax-foo', 'taxonomy-custom-tax', 'taxonomy'];
-        assertSame($expected, $branch->leaves($query));
+        static::assertSame($expected, $branch->leaves($query));
     }
 }

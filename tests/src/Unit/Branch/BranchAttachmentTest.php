@@ -27,7 +27,7 @@ final class BranchAttachmentTest extends TestCase
         $post->post_mime_type = '';
         $wpQuery = new \WP_Query(['is_attachment'], $post);
 
-        assertSame(['attachment'], $branch->leaves($wpQuery));
+        static::assertSame(['attachment'], $branch->leaves($wpQuery));
     }
 
     public function testLeaves()
@@ -38,6 +38,6 @@ final class BranchAttachmentTest extends TestCase
         $wpQuery = new \WP_Query(['is_attachment'], $post);
         $wpQuery->post = $post;
 
-        assertSame(['image', 'jpeg', 'image_jpeg', 'attachment'], $branch->leaves($wpQuery));
+        static::assertSame(['image', 'jpeg', 'image_jpeg', 'attachment'], $branch->leaves($wpQuery));
     }
 }

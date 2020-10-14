@@ -13,7 +13,7 @@ namespace Brain\Hierarchy\Tests\Functional;
 use Brain\Hierarchy\Hierarchy;
 use Brain\Hierarchy\Tests\TestCase;
 use Brain\Monkey\Functions;
-use Brain\Monkey\WP\Filters;
+use Brain\Monkey\Filters;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
@@ -30,7 +30,7 @@ class HierarchyTest extends TestCase
         $post->post_name = '%E3%81%B2%E3%82%89';
         $post->post_type = 'book';
 
-        Functions::when('get_page_template_slug')->justReturn(false);
+        Functions\when('get_page_template_slug')->justReturn(false);
 
         $query = new \WP_Query(
             ['is_single' => true, 'is_singular' => true],
@@ -57,12 +57,12 @@ class HierarchyTest extends TestCase
 
         $actual = $hierarchy->getHierarchy($query);
 
-        $this->assertSame($expected, $actual);
+        static::assertSame($expected, $actual);
     }
 
     public function testGetHierarchyFiltered()
     {
-        Filters::expectApplied('brain.hierarchy.branches')
+        Filters\expectApplied('brain.hierarchy.branches')
                ->once()
                ->andReturnUsing(function (array $branches) {
                    unset($branches['singular']);
@@ -70,7 +70,7 @@ class HierarchyTest extends TestCase
                    return $branches;
                });
 
-        Filters::expectApplied('index_template_hierarchy')
+        Filters\expectApplied('index_template_hierarchy')
                ->once()
                ->andReturnUsing(function (array $leaves) {
                    $leaves[] = 'jolly';
@@ -78,7 +78,7 @@ class HierarchyTest extends TestCase
                    return $leaves;
                });
 
-        Functions::when('get_page_template_slug')->justReturn(false);
+        Functions\when('get_page_template_slug')->justReturn(false);
 
         $post = \Mockery::mock('WP_Post');
         $post->ID = 1;
@@ -108,12 +108,12 @@ class HierarchyTest extends TestCase
 
         $actual = $hierarchy->getHierarchy($query);
 
-        $this->assertSame($expected, $actual);
+        static::assertSame($expected, $actual);
     }
 
     public function testGetHierarchyNotAppliesFiltersIfNotFiltered()
     {
-        Filters::expectApplied('index_template_hierarchy')
+        Filters\expectApplied('index_template_hierarchy')
                ->zeroOrMoreTimes()
                ->andReturnUsing(function (array $leaves) {
                    $leaves[] = 'jolly';
@@ -121,7 +121,7 @@ class HierarchyTest extends TestCase
                    return $leaves;
                });
 
-        Functions::when('get_page_template_slug')->justReturn(false);
+        Functions\when('get_page_template_slug')->justReturn(false);
 
         $post = \Mockery::mock('WP_Post');
         $post->ID = 1;
@@ -153,6 +153,6 @@ class HierarchyTest extends TestCase
 
         $actual = $hierarchy->getHierarchy($query);
 
-        $this->assertSame($expected, $actual);
+        static::assertSame($expected, $actual);
     }
 }

@@ -23,7 +23,7 @@ class CascadeAggregateTemplateLoaderTest extends TestCase
     public function testLoadReturnEmptyIfNoLoaders()
     {
         $loader = new CascadeAggregateTemplateLoader();
-        assertSame('', $loader->load('foo'));
+        static::assertSame('', $loader->load('foo'));
     }
 
     public function testLoadWithAddedLoader()
@@ -38,8 +38,8 @@ class CascadeAggregateTemplateLoaderTest extends TestCase
         $loader = new CascadeAggregateTemplateLoader();
         $loader->addLoader($innerLoader, $predicate);
 
-        assertSame('Loaded!', $loader->load('/a/path'));
-        assertSame('', $loader->load('/another/path'));
+        static::assertSame('Loaded!', $loader->load('/a/path'));
+        static::assertSame('', $loader->load('/another/path'));
     }
 
     public function testLoadWithAddedLoaderFactory()
@@ -63,8 +63,8 @@ class CascadeAggregateTemplateLoaderTest extends TestCase
         $loader = new CascadeAggregateTemplateLoader();
         $loader->addLoaderFactory($factory, $predicate);
 
-        assertSame('Loaded!', $loader->load('/a/path'));
-        assertSame('', $loader->load('/another/path'));
+        static::assertSame('Loaded!', $loader->load('/a/path'));
+        static::assertSame('', $loader->load('/another/path'));
     }
 
     public function testLoadPriority()
@@ -97,7 +97,7 @@ class CascadeAggregateTemplateLoaderTest extends TestCase
             ->addLoaderFactory($factory, $aPredicate)
             ->addLoader($innerLoader, $bPredicate);
 
-        assertSame('A!', $loader->load('/a/path'));
-        assertSame('B!', $loader->load('/another/path'));
+        static::assertSame('A!', $loader->load('/a/path'));
+        static::assertSame('B!', $loader->load('/another/path'));
     }
 }

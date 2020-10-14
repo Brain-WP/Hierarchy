@@ -24,13 +24,13 @@ final class LocalizedTemplateFinderTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        Functions::when('get_stylesheet_directory')->alias(function () {
+        Functions\when('get_stylesheet_directory')->alias(function () {
             return getenv('HIERARCHY_TESTS_BASEPATH');
         });
-        Functions::when('get_template_directory')->alias(function () {
+        Functions\when('get_template_directory')->alias(function () {
             return getenv('HIERARCHY_TESTS_BASEPATH');
         });
-        Functions::when('get_locale')->alias(function () {
+        Functions\when('get_locale')->alias(function () {
             return 'it_IT';
         });
     }
@@ -42,7 +42,7 @@ final class LocalizedTemplateFinderTest extends TestCase
         });
         $finder = new LocalizedTemplateFinder($callbackFinder);
 
-        assertSame('', $finder->find('foo', 'foo'));
+        static::assertSame('', $finder->find('foo', 'foo'));
     }
 
     public function testFind()
@@ -54,8 +54,8 @@ final class LocalizedTemplateFinderTest extends TestCase
 
         $finder = new LocalizedTemplateFinder($callbackFinder);
 
-        assertSame("{$path}/it/page.php", $finder->find('page', 'page'));
-        assertSame("{$path}/it_IT/single.php", $finder->find('single', 'single'));
+        static::assertSame("{$path}/it/page.php", $finder->find('page', 'page'));
+        static::assertSame("{$path}/it_IT/single.php", $finder->find('single', 'single'));
     }
 
     public function testFindFirst()
@@ -67,9 +67,17 @@ final class LocalizedTemplateFinderTest extends TestCase
 
         $finder = new LocalizedTemplateFinder($callbackFinder);
 
-        assertSame("{$path}/it/page.php", $finder->findFirst(['foo', 'page', 'bar'], 'page'));
-        assertSame("{$path}/it_IT/single.php",
-            $finder->findFirst(['foo', 'single', 'bar'], 'single'));
-        assertSame("{$path}/another.php", $finder->findFirst(['foo', 'meh', 'another'], 'foo'));
+        static::assertSame(
+            "{$path}/it/page.php",
+            $finder->findFirst(['foo', 'page', 'bar'], 'page')
+        );
+        static::assertSame(
+            "{$path}/it_IT/single.php",
+            $finder->findFirst(['foo', 'single', 'bar'], 'single')
+        );
+        static::assertSame(
+            "{$path}/another.php",
+            $finder->findFirst(['foo', 'meh', 'another'], 'foo')
+        );
     }
 }

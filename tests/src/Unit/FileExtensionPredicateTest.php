@@ -24,9 +24,12 @@ class FileExtensionPredicateTest extends TestCase
      */
     public function testParseExtensions($input, $output)
     {
-        assertEquals($output, $extension = FileExtensionPredicate::parseExtensions($input));
+        static::assertEquals($output, $extension = FileExtensionPredicate::parseExtensions($input));
     }
 
+    /**
+     * @return array
+     */
     public function parseExtensionsProvider()
     {
         return [
@@ -43,10 +46,10 @@ class FileExtensionPredicateTest extends TestCase
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate('php');
 
-        assertTrue($predicate('index.php'));
-        assertTrue($predicate('foo.PHP'));
-        assertFalse($predicate('foo.phtml'));
-        assertFalse($predicate('.phtml'));
+        static::assertTrue($predicate('index.php'));
+        static::assertTrue($predicate('foo.PHP'));
+        static::assertFalse($predicate('foo.phtml'));
+        static::assertFalse($predicate('.phtml'));
     }
 
     public function testSingleExtensionNormalize()
@@ -54,9 +57,9 @@ class FileExtensionPredicateTest extends TestCase
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate(' .pHP ');
 
-        assertTrue($predicate('foo.php'));
-        assertTrue($predicate('foo.PHP'));
-        assertFalse($predicate('foo.phtml'));
+        static::assertTrue($predicate('foo.php'));
+        static::assertTrue($predicate('foo.PHP'));
+        static::assertFalse($predicate('foo.phtml'));
     }
 
     public function testMultiExtensionString()
@@ -64,11 +67,11 @@ class FileExtensionPredicateTest extends TestCase
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate(' php | PHTML | .inc ');
 
-        assertTrue($predicate('foo.php'));
-        assertTrue($predicate('foo.PHP'));
-        assertTrue($predicate('foo.phtml'));
-        assertTrue($predicate('foo.inc'));
-        assertFalse($predicate('foo.twig'));
+        static::assertTrue($predicate('foo.php'));
+        static::assertTrue($predicate('foo.PHP'));
+        static::assertTrue($predicate('foo.phtml'));
+        static::assertTrue($predicate('foo.inc'));
+        static::assertFalse($predicate('foo.twig'));
     }
 
     public function testMultiExtensionArray()
@@ -76,10 +79,10 @@ class FileExtensionPredicateTest extends TestCase
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate([' php ', 'PHTML ', ' .inc']);
 
-        assertTrue($predicate('foo.php'));
-        assertTrue($predicate('foo.PHP'));
-        assertTrue($predicate('foo.phtml'));
-        assertTrue($predicate('foo.inc'));
-        assertFalse($predicate('foo.twig'));
+        static::assertTrue($predicate('foo.php'));
+        static::assertTrue($predicate('foo.PHP'));
+        static::assertTrue($predicate('foo.phtml'));
+        static::assertTrue($predicate('foo.inc'));
+        static::assertFalse($predicate('foo.twig'));
     }
 }

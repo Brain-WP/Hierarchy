@@ -24,7 +24,7 @@ final class BranchTagTest extends TestCase
         $query = new \WP_Query();
         $branch = new BranchTag();
 
-        assertSame(['tag'], $branch->leaves($query));
+        static::assertSame(['tag'], $branch->leaves($query));
     }
 
     public function testLeaves()
@@ -33,6 +33,6 @@ final class BranchTagTest extends TestCase
         $query = new \WP_Query([], $tag);
 
         $branch = new BranchTag();
-        assertSame(['tag-foo', 'tag-123', 'tag'], $branch->leaves($query));
+        static::assertSame(['tag-foo', 'tag-123', 'tag'], $branch->leaves($query));
     }
 }

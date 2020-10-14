@@ -41,7 +41,7 @@ class PostTemplatesTest extends TestCase
         $post->ID = 123;
         $post->post_type = 'event';
 
-        Functions::expect('get_page_template_slug')
+        Functions\expect('get_page_template_slug')
                  ->once()
                  ->with($post)
                  ->andReturn(false);
@@ -57,22 +57,22 @@ class PostTemplatesTest extends TestCase
         $post->ID = 123;
         $post->post_type = 'event';
 
-        Functions::expect('get_page_template_slug')
+        Functions\expect('get_page_template_slug')
                  ->once()
                  ->with($post)
                  ->andReturn('foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->once()
                  ->with('foo.php')
                  ->andReturn('foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->once()
                  ->with('bar.php')
                  ->andReturn('bar.php');
 
-        Functions::expect('validate_file')
+        Functions\expect('validate_file')
                  ->once()
                  ->with('foo.php')
                  ->andReturn(0);
@@ -83,7 +83,7 @@ class PostTemplatesTest extends TestCase
               ->with(null, 'event')
               ->andReturn(['bar.php' => 'Bar']);
 
-        Functions::expect('wp_get_theme')
+        Functions\expect('wp_get_theme')
                  ->once()
                  ->andReturn($theme);
 
@@ -98,24 +98,24 @@ class PostTemplatesTest extends TestCase
         $post->ID = 123;
         $post->post_type = 'event';
 
-        Functions::expect('get_page_template_slug')
+        Functions\expect('get_page_template_slug')
                  ->once()
                  ->with($post)
                  ->andReturn('foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->atLeast()
                  ->once()
                  ->with('foo.php')
                  ->andReturn('foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->atLeast()
                  ->once()
                  ->with('bar.php')
                  ->andReturn('bar.php');
 
-        Functions::expect('validate_file')
+        Functions\expect('validate_file')
                  ->atLeast()
                  ->once()
                  ->with('foo.php')
@@ -127,7 +127,7 @@ class PostTemplatesTest extends TestCase
               ->with(null, 'event')
               ->andReturn(['foo.php' => 'Foo', 'bar.php' => 'Bar']);
 
-        Functions::expect('wp_get_theme')
+        Functions\expect('wp_get_theme')
                  ->once()
                  ->andReturn($theme);
 
@@ -142,24 +142,24 @@ class PostTemplatesTest extends TestCase
         $post->ID = 123;
         $post->post_type = 'event';
 
-        Functions::expect('get_page_template_slug')
+        Functions\expect('get_page_template_slug')
                  ->once()
                  ->with($post)
                  ->andReturn('path/foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->atLeast()
                  ->once()
                  ->with('path/foo.php')
                  ->andReturn('path/foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->atLeast()
                  ->once()
                  ->with('bar.php')
                  ->andReturn('bar.php');
 
-        Functions::expect('validate_file')
+        Functions\expect('validate_file')
                  ->atLeast()
                  ->once()
                  ->with('path/foo.php')
@@ -171,7 +171,7 @@ class PostTemplatesTest extends TestCase
               ->with(null, 'event')
               ->andReturn(['path/foo.php' => 'Foo', 'bar.php' => 'Bar']);
 
-        Functions::expect('wp_get_theme')
+        Functions\expect('wp_get_theme')
                  ->once()
                  ->andReturn($theme);
 
@@ -186,25 +186,25 @@ class PostTemplatesTest extends TestCase
         $post->ID = 123;
         $post->post_type = 'event';
 
-        Functions::expect('get_page_template_slug')
+        Functions\expect('get_page_template_slug')
                  ->atLeast()
                  ->once()
                  ->with($post)
                  ->andReturn('path/foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->atLeast()
                  ->once()
                  ->with('path/foo.php')
                  ->andReturn('path/foo.php');
 
-        Functions::expect('wp_normalize_path')
+        Functions\expect('wp_normalize_path')
                  ->atLeast()
                  ->once()
                  ->with('bar.php')
                  ->andReturn('bar.php');
 
-        Functions::expect('validate_file')
+        Functions\expect('validate_file')
                  ->atLeast()
                  ->once()
                  ->with('path/foo.php')
@@ -216,7 +216,7 @@ class PostTemplatesTest extends TestCase
               ->with(null, 'event')
               ->andReturn(['path/foo.php' => 'Foo', 'bar.php' => 'Bar']);
 
-        Functions::expect('wp_get_theme')
+        Functions\expect('wp_get_theme')
                  ->once()
                  ->andReturn($theme);
 

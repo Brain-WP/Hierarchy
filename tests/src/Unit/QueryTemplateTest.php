@@ -11,7 +11,7 @@
 namespace Brain\Hierarchy\Tests\Unit;
 
 use Andrew\Proxy;
-use Brain\Monkey\WP\Filters;
+use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use Brain\Hierarchy\QueryTemplate;
 use Brain\Hierarchy\Tests\TestCase;
@@ -35,12 +35,12 @@ class QueryTemplateTest extends TestCase
 
         $loader = new QueryTemplate($finder);
 
-        assertSame($template, $loader->findTemplate($wpQuery, false));
+        static::assertSame($template, $loader->findTemplate($wpQuery, false));
     }
 
     public function testFindFilters()
     {
-        Filters::expectApplied('index_template')->once()->andReturn('foo.php');
+        Filters\expectApplied('index_template')->once()->andReturn('foo.php');
 
         $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/index.php';
         $wpQuery = new \WP_Query();
@@ -49,7 +49,7 @@ class QueryTemplateTest extends TestCase
 
         $loader = new QueryTemplate($finder);
 
-        assertSame('foo.php', $loader->findTemplate($wpQuery, true));
+        static::assertSame('foo.php', $loader->findTemplate($wpQuery, true));
     }
 
     public function testLoadNoFilters()
@@ -61,7 +61,7 @@ class QueryTemplateTest extends TestCase
 
         $loader = new QueryTemplate($finder);
 
-        assertSame('index', $loader->loadTemplate($wpQuery, false));
+        static::assertSame('index', $loader->loadTemplate($wpQuery, false));
     }
 
     public function testLoadFilters()
@@ -69,14 +69,14 @@ class QueryTemplateTest extends TestCase
         $wpQuery = new \WP_Query();
         $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/another.php';
 
-        Filters::expectApplied('template_include')->once()->andReturn($template);
+        Filters\expectApplied('template_include')->once()->andReturn($template);
 
         $finder = Mockery::mock(TemplateFinderInterface::class);
         $finder->shouldReceive('findFirst')->once()->with(['index'], 'index')->andReturn('foo');
 
         $loader = new QueryTemplate($finder);
 
-        assertSame('another', $loader->loadTemplate($wpQuery, true));
+        static::assertSame('another', $loader->loadTemplate($wpQuery, true));
     }
 
     public function testLoadTemplateFoundFalse()
@@ -91,8 +91,8 @@ class QueryTemplateTest extends TestCase
         $loader = new QueryTemplate($finder);
         $loaded = $loader->loadTemplate($wpQuery, false, $found);
 
-        assertFalse($found);
-        assertSame('', $loaded);
+        static::assertFalse($found);
+        static::assertSame('', $loaded);
     }
 
     public function testLoadTemplateFoundTrue()
@@ -109,8 +109,8 @@ class QueryTemplateTest extends TestCase
         $loader = new QueryTemplate($finder);
         $loaded = $loader->loadTemplate($wpQuery, false, $found);
 
-        assertTrue($found);
-        assertSame('page', $loaded);
+        static::assertTrue($found);
+        static::assertSame('page', $loaded);
     }
 
     public function testApplyFilters()
@@ -123,92 +123,94 @@ class QueryTemplateTest extends TestCase
         $customQuery = new \WP_Query();
 
         // during filter, globals `$wp_query` and `$wp_the_query` are equal to custom query
-        Filters::expectApplied('test_filter')
+        Filters\expectApplied('test_filter')
             ->once()
             ->with('foo')
             ->andReturnUsing(
                 function () use ($customQuery) {
-                    assertSame($GLOBALS['wp_query'], $customQuery);
-                    assertSame($GLOBALS['wp_the_query'], $customQuery);
+                    static::assertSame($GLOBALS['wp_query'], $customQuery);
+                    static::assertSame($GLOBALS['wp_the_query'], $customQuery);
 
                     return 'bar!';
                 }
             );
 
         $finder = \Mockery::mock(TemplateFinderInterface::class);
+
         $queryTemplate = new Proxy(new QueryTemplate($finder));
+        /** @noinspection PhpUndefinedMethodInspection */
         $applied = $queryTemplate->applyFilter('test_filter', 'foo', $customQuery);
 
         // after filter, globals `$wp_query` and `$wp_the_query` are restored
 
-        assertSame($GLOBALS['wp_query'], $wpQuery);
-        assertSame($GLOBALS['wp_the_query'], $wpQuery);
-        assertSame('bar!', $applied);
+        static::assertSame($GLOBALS['wp_query'], $wpQuery);
+        static::assertSame($GLOBALS['wp_the_query'], $wpQuery);
+        static::assertSame('bar!', $applied);
 
         unset($wp_query, $wp_the_query);
     }
 
     public function testMainQueryTemplateAllowedTrue()
     {
-        Functions::when('is_robots')->justReturn(false);
-        Functions::when('is_feed')->justReturn(false);
-        Functions::when('is_trackback')->justReturn(false);
-        Functions::when('is_embed')->justReturn(false);
+        Functions\when('is_robots')->justReturn(false);
+        Functions\when('is_feed')->justReturn(false);
+        Functions\when('is_trackback')->justReturn(false);
+        Functions\when('is_embed')->justReturn(false);
 
-        assertTrue(QueryTemplate::mainQueryTemplateAllowed());
+        static::assertTrue(QueryTemplate::mainQueryTemplateAllowed());
     }
 
     public function testMainQueryTemplateAllowedFalseIsRobots()
     {
-        Functions::when('is_robots')->justReturn(true);
-        Functions::when('is_feed')->justReturn(false);
-        Functions::when('is_trackback')->justReturn(false);
-        Functions::when('is_embed')->justReturn(false);
+        Functions\when('is_robots')->justReturn(true);
+        Functions\when('is_feed')->justReturn(false);
+        Functions\when('is_trackback')->justReturn(false);
+        Functions\when('is_embed')->justReturn(false);
 
-        assertFalse(QueryTemplate::mainQueryTemplateAllowed());
+        static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
     public function testMainQueryTemplateAllowedFalseIsFeed()
     {
-        Functions::when('is_robots')->justReturn(false);
-        Functions::when('is_feed')->justReturn(true);
-        Functions::when('is_trackback')->justReturn(false);
-        Functions::when('is_embed')->justReturn(false);
+        Functions\when('is_robots')->justReturn(false);
+        Functions\when('is_feed')->justReturn(true);
+        Functions\when('is_trackback')->justReturn(false);
+        Functions\when('is_embed')->justReturn(false);
 
-        assertFalse(QueryTemplate::mainQueryTemplateAllowed());
+        static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
     public function testMainQueryTemplateAllowedFalseIsTrackback()
     {
-        Functions::when('is_robots')->justReturn(false);
-        Functions::when('is_feed')->justReturn(false);
-        Functions::when('is_trackback')->justReturn(true);
-        Functions::when('is_embed')->justReturn(false);
+        Functions\when('is_robots')->justReturn(false);
+        Functions\when('is_feed')->justReturn(false);
+        Functions\when('is_trackback')->justReturn(true);
+        Functions\when('is_embed')->justReturn(false);
 
-        assertFalse(QueryTemplate::mainQueryTemplateAllowed());
+        static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
     public function testMainQueryTemplateAllowedFalseIsEmbed()
     {
-        Functions::when('is_robots')->justReturn(false);
-        Functions::when('is_feed')->justReturn(false);
-        Functions::when('is_trackback')->justReturn(false);
-        Functions::when('is_embed')->justReturn(true);
+        Functions\when('is_robots')->justReturn(false);
+        Functions\when('is_feed')->justReturn(false);
+        Functions\when('is_trackback')->justReturn(false);
+        Functions\when('is_embed')->justReturn(true);
 
-        assertFalse(QueryTemplate::mainQueryTemplateAllowed());
+        static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
     public function testInstanceWithLoader()
     {
-        Functions::when('get_stylesheet_directory')->justReturn();
-        Functions::when('get_template_directory')->justReturn();
+        Functions\when('get_stylesheet_directory')->justReturn();
+        Functions\when('get_template_directory')->justReturn();
 
         $loader = Mockery::mock(TemplateLoaderInterface::class);
         $instance = QueryTemplate::instanceWithLoader($loader);
         $proxy = new Proxy($instance);
 
-        assertInstanceOf(QueryTemplate::class, $instance);
-        assertSame($loader, $proxy->loader);
+        static::assertInstanceOf(QueryTemplate::class, $instance);
+        static::assertSame($loader, $proxy->loader);
     }
 
     public function instanceWithFolders()
@@ -218,8 +220,8 @@ class QueryTemplateTest extends TestCase
         $instance = QueryTemplate::instanceWithFolders($folders, $loader);
         $proxy = new Proxy($instance);
 
-        assertInstanceOf(QueryTemplate::class, $instance);
-        assertInstanceOf(FoldersTemplateFinder::class, $proxy->finder);
-        assertSame($loader, $proxy->loader);
+        static::assertInstanceOf(QueryTemplate::class, $instance);
+        static::assertInstanceOf(FoldersTemplateFinder::class, $proxy->finder);
+        static::assertSame($loader, $proxy->loader);
     }
 }

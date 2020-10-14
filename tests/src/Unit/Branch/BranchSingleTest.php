@@ -31,7 +31,7 @@ final class BranchSingleTest extends TestCase
 
         $branch = new BranchSingle();
 
-        assertSame(['single'], $branch->leaves($query));
+        static::assertSame(['single'], $branch->leaves($query));
     }
 
     public function testLeavesNoTemplate()
@@ -57,7 +57,7 @@ final class BranchSingleTest extends TestCase
             'single'
         ];
 
-        assertSame($expected, $branch->leaves($query));
+        static::assertSame($expected, $branch->leaves($query));
     }
 
     public function testLeavesPostTemplate()
@@ -84,6 +84,6 @@ final class BranchSingleTest extends TestCase
             'single'
         ];
 
-        assertSame($expected, $branch->leaves($query));
+        static::assertSame($expected, $branch->leaves($query));
     }
 }

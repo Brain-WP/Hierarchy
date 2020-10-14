@@ -23,13 +23,13 @@ final class SymfonyFinderAdapterTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        Functions::when('trailingslashit')->alias(function ($str) {
+        Functions\when('trailingslashit')->alias(function ($str) {
             return rtrim($str, '\\/').'/';
         });
-        Functions::when('get_stylesheet_directory')->alias(function () {
+        Functions\when('get_stylesheet_directory')->alias(function () {
             return getenv('HIERARCHY_TESTS_BASEPATH').'/files';
         });
-        Functions::when('get_template_directory')->alias(function () {
+        Functions\when('get_template_directory')->alias(function () {
             return getenv('HIERARCHY_TESTS_BASEPATH').'/files';
         });
     }
@@ -40,7 +40,7 @@ final class SymfonyFinderAdapterTest extends TestCase
 
         $finder = new SymfonyFinderAdapter();
 
-        assertSame($template, $finder->find('index', 'index'));
+        static::assertSame($template, $finder->find('index', 'index'));
     }
 
     public function testFindFirst()
@@ -49,7 +49,7 @@ final class SymfonyFinderAdapterTest extends TestCase
 
         $finder = new SymfonyFinderAdapter();
 
-        assertSame($template, $finder->findFirst(['foo', 'another', 'index'], 'index'));
+        static::assertSame($template, $finder->findFirst(['foo', 'another', 'index'], 'index'));
     }
 
     public function testFindFirstFolders()
@@ -58,6 +58,6 @@ final class SymfonyFinderAdapterTest extends TestCase
 
         $finder = new SymfonyFinderAdapter();
 
-        assertSame($template, $finder->findFirst(['foo', 'it/page', 'index'], 'page'));
+        static::assertSame($template, $finder->findFirst(['foo', 'it/page', 'index'], 'page'));
     }
 }

@@ -25,7 +25,7 @@ class FileExtensionPredicate
      * @param string|string[] $extensions
      * @param string          $trimPattern
      *
-     * @return \string[]
+     * @return string[]
      */
     public static function parseExtensions($extensions, $trimPattern = ". \t\n\r\0\x0B")
     {
