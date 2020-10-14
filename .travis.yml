@@ -1,14 +1,26 @@
+# TravisCI configuration for brain/hierarchy
+
 language: php
+os:
+  - linux
+dist: xenial
 
 php:
-  - 5.6
-  - 7.0
-  - 7.1
-  - 7.2
   - 7.3
+  - 7.2
+  - 7.1
+  - 7.0
+  - 5.6
 
-before_script:
-  - composer install
+cache:
+  directories:
+    - "${HOME}/.composer/cache"
+
+before_install:
+  - composer validate --strict
+
+install:
+  - composer update
 
 script:
   - mkdir -p build/logs
