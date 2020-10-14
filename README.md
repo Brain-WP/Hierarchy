@@ -598,7 +598,7 @@ add_action( 'template_redirect', function() {
 
 # Requirements
 
-Hierarchy requires **PHP 5.5+** and [Composer](https://getcomposer.org/) to be installed.
+Hierarchy requires **PHP 5.6+** and [Composer](https://getcomposer.org/) to be installed.
 
 
 # Installation
