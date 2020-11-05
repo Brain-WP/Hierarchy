@@ -203,7 +203,7 @@ add_action( 'template_redirect', function() {
 
     global $wp_query;
     
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate();
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate();
     
     echo $queryTemplate->loadTemplate( $wp_query );
     
@@ -234,7 +234,7 @@ Moreover, this feature can be used to alter the content before to output it:
 ```php
 add_action( 'template_redirect', function() {
 
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate();
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate();
         
     // if no WP_Query object is passed to loadTemplate(), the global $wp_query is used
     $content = $queryTemplate->loadTemplate();
@@ -276,13 +276,13 @@ Example:
 ```php
 add_action( 'template_redirect', function() {
 
-    $finder = \Brain\Hierarchy\Finder\FoldersTemplateFinder([
+    $finder = new \Brain\Hierarchy\Finder\FoldersTemplateFinder([
        __DIR__,
        get_stylesheet_directory(),
        get_template_directory(),
     ]);
     
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate( $finder );  
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate( $finder );  
       
     echo $queryTemplate->loadTemplate();
     
@@ -301,14 +301,14 @@ use different file extensions, by passing them as a second constructor argument 
 
 ```php
 // This will look for *.phtml files.
-$phtml_finder = \Brain\Hierarchy\Finder\FoldersTemplateFinder(
+$phtml_finder = new \Brain\Hierarchy\Finder\FoldersTemplateFinder(
     [ get_stylesheet_directory(), get_template_directory() ],
     'phtml'
 );
 
 // This will look for Twig files first, and fall back to standard PHP files if
 // no matching Twig file was found.
-$twig_finder = \Brain\Hierarchy\Finder\FoldersTemplateFinder(
+$twig_finder = new \Brain\Hierarchy\Finder\FoldersTemplateFinder(
     [ get_stylesheet_directory(), get_template_directory() ],
     [ 'twig', 'php' ]
 );
@@ -324,9 +324,9 @@ is a specific subfolder of theme (and parent theme) and use theme (and parent th
 ```php
 add_action( 'template_redirect', function() {
 
-    $finder = \Brain\Hierarchy\Finder\SubfolderTemplateFinder( 'templates' );
+    $finder = new \Brain\Hierarchy\Finder\SubfolderTemplateFinder( 'templates' );
 
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate( $finder );
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate( $finder );
 
     echo $queryTemplate->loadTemplate();
     exit();
@@ -358,7 +358,7 @@ add_action( 'template_redirect', function() {
 
     $finder = new \Brain\Hierarchy\Finder\LocalizedTemplateFinder( $foldersFinder );
 
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate( $finder );
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate( $finder );
 
     echo $queryTemplate->loadTemplate();
     exit();
@@ -388,7 +388,7 @@ add_action( 'template_redirect', function() {
 
     $finder = new \Brain\Hierarchy\Finder\SymfonyFinderAdapter( $symfonyFinder );
 
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate( $finder );
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate( $finder );
 
     echo $queryTemplate->loadTemplate();
     exit();
@@ -415,7 +415,7 @@ add_action( 'template_redirect', function() {
 
     $finder = new \Brain\Hierarchy\Finder\CallbackTemplateFinder( $callback );
 
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate( $finder );
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate( $finder );
 
     echo $queryTemplate->loadTemplate();
     exit();
@@ -579,7 +579,7 @@ add_action( 'template_redirect', function() {
     // make use of the class above
     $loader = new MustacheTemplateLoader( new Mustache_Engine() );
 
-    $queryTemplate = \Brain\Hierarchy\QueryTemplate( $finder, $loader );
+    $queryTemplate = new \Brain\Hierarchy\QueryTemplate( $finder, $loader );
 
     // 3rd argument of loadTemplate() is passed by reference, and is set to true if template is found
     $found = false;
