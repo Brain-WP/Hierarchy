@@ -1,18 +1,13 @@
-Hierarchy
-=========
-
-> Hierarchy is package that aims to represent with PHP objects the WordPress template hierarchy.
-
-----------
+# Hierarchy
 
 [![travis-ci status](https://img.shields.io/travis/Brain-WP/Hierarchy.svg?style=flat-square)](https://travis-ci.org/Brain-WP/Hierarchy)
 [![codecov.io](https://img.shields.io/codecov/c/github/Brain-WP/Hierarchy.svg?style=flat-square)](http://codecov.io/github/Brain-WP/Hierarchy?branch=master)
 [![license](https://img.shields.io/packagist/l/brain/hierarchy.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 [![release](https://img.shields.io/github/release/Brain-WP/Hierarchy.svg?style=flat-square)](https://github.com/Brain-WP/Hierarchy/releases/latest)
 
-----------
+Representation of the WordPress template hierarchy with PHP objects.
 
-# TOC
+### TOC
 
 - [What / Why?](#what--why)
 - [Template Hierarchy Representation](#template-hierarchy-representation)
