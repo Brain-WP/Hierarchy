@@ -65,6 +65,7 @@ final class QueryTemplate implements QueryTemplateInterface
                 || !apply_filters('exit_on_http_head', true)
             )
             && !is_robots()
+            && !is_favicon()
             && !is_feed()
             && !is_trackback()
             && !is_embed();
