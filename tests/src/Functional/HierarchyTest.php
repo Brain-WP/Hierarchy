@@ -1,4 +1,5 @@
-<?php # -*- coding: utf-8 -*-
+<?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Brain\Hierarchy\Tests\Functional;
 
@@ -22,8 +25,10 @@ use Brain\Monkey\Filters;
  */
 class HierarchyTest extends TestCase
 {
-
-    public function testGetHierarchy()
+    /**
+     * @test
+     */
+    public function testGetHierarchy(): void
     {
         $post = \Mockery::mock('WP_Post');
         $post->ID = 1;
@@ -41,42 +46,45 @@ class HierarchyTest extends TestCase
         $hierarchy = new Hierarchy();
 
         $expected = [
-            'single'   => [
+            'single' => [
                 'single-book-ひら',
                 'single-book-%E3%81%B2%E3%82%89',
                 'single-book',
                 'single',
             ],
             'singular' => [
-                'singular'
+                'singular',
             ],
-            'index'    => [
-                'index'
+            'index' => [
+                'index',
             ],
         ];
 
-        $actual = $hierarchy->getHierarchy($query);
+        $actual = $hierarchy->hierarchy($query);
 
         static::assertSame($expected, $actual);
     }
 
-    public function testGetHierarchyFiltered()
+    /**
+     * @test
+     */
+    public function testGetHierarchyFiltered(): void
     {
         Filters\expectApplied('brain.hierarchy.branches')
-               ->once()
-               ->andReturnUsing(function (array $branches) {
-                   unset($branches['singular']);
+            ->once()
+            ->andReturnUsing(static function (array $branches): array {
+                unset($branches['singular']);
 
-                   return $branches;
-               });
+                return $branches;
+            });
 
         Filters\expectApplied('index_template_hierarchy')
-               ->once()
-               ->andReturnUsing(function (array $leaves) {
-                   $leaves[] = 'jolly';
+            ->once()
+            ->andReturnUsing(static function (array $leaves): array {
+                $leaves[] = 'jolly';
 
-                   return $leaves;
-               });
+                return $leaves;
+            });
 
         Functions\when('get_page_template_slug')->justReturn(false);
 
@@ -94,32 +102,38 @@ class HierarchyTest extends TestCase
         $hierarchy = new Hierarchy();
 
         $expected = [
-            'single'   => [
+            'single' => [
                 'single-book-ひら',
                 'single-book-%E3%81%B2%E3%82%89',
                 'single-book',
                 'single',
             ],
-            'index'    => [
+            'singular' => [
+                'singular',
+            ],
+            'index' => [
                 'index',
-                'jolly'
+                'jolly',
             ],
         ];
 
-        $actual = $hierarchy->getHierarchy($query);
+        $actual = $hierarchy->hierarchy($query);
 
         static::assertSame($expected, $actual);
     }
 
-    public function testGetHierarchyNotAppliesFiltersIfNotFiltered()
+    /**
+     * @test
+     */
+    public function testGetHierarchyNotAppliesFiltersIfNotFiltered(): void
     {
         Filters\expectApplied('index_template_hierarchy')
-               ->zeroOrMoreTimes()
-               ->andReturnUsing(function (array $leaves) {
-                   $leaves[] = 'jolly';
+            ->zeroOrMoreTimes()
+            ->andReturnUsing(static function (array $leaves): array {
+                $leaves[] = 'jolly';
 
-                   return $leaves;
-               });
+                return $leaves;
+            });
 
         Functions\when('get_page_template_slug')->justReturn(false);
 
@@ -137,21 +151,21 @@ class HierarchyTest extends TestCase
         $hierarchy = new Hierarchy(Hierarchy::NOT_FILTERABLE);
 
         $expected = [
-            'single'   => [
+            'single' => [
                 'single-book-ひら',
                 'single-book-%E3%81%B2%E3%82%89',
                 'single-book',
                 'single',
             ],
             'singular' => [
-                'singular'
+                'singular',
             ],
-            'index'    => [
-                'index'
+            'index' => [
+                'index',
             ],
         ];
 
-        $actual = $hierarchy->getHierarchy($query);
+        $actual = $hierarchy->hierarchy($query);
 
         static::assertSame($expected, $actual);
     }

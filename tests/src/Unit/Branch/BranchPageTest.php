@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,24 +9,27 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
 use Brain\Hierarchy\PostTemplates;
 use Brain\Monkey\Functions;
 use Brain\Hierarchy\Branch\BranchPage;
 use Brain\Hierarchy\Tests\TestCase;
-use Mockery;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchPageTest extends TestCase
+class BranchPageTest extends TestCase
 {
-
-    public function testLeavesNoPageNoPagename()
+    /**
+     * @test
+     */
+    public function testLeavesNoPageNoPagename(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 0;
         $post->post_name = '';
         $post->post_type = '';
@@ -37,9 +41,12 @@ final class BranchPageTest extends TestCase
         static::assertSame(['page'], $branch->leaves($query));
     }
 
-    public function testLeavesNoPage()
+    /**
+     * @test
+     */
+    public function testLeavesNoPage(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 0;
         $post->post_name = '';
         $post->post_type = '';
@@ -52,17 +59,19 @@ final class BranchPageTest extends TestCase
         static::assertSame(['page-foo', 'page'], $branch->leaves($query));
     }
 
-    public function testLeavesPage()
+    /**
+     * @test
+     */
+    public function testLeavesPage(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 1;
         $post->post_name = 'foo';
         $post->post_type = 'page';
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('');
 
@@ -72,17 +81,19 @@ final class BranchPageTest extends TestCase
         static::assertSame(['page-foo', 'page-1', 'page'], $branch->leaves($query));
     }
 
-    public function testLeavesPagePagename()
+    /**
+     * @test
+     */
+    public function testLeavesPagePagename(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 1;
         $post->post_name = 'foo';
         $post->post_type = 'page';
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('');
 
@@ -93,17 +104,19 @@ final class BranchPageTest extends TestCase
         static::assertSame(['page-bar', 'page-1', 'page'], $branch->leaves($query));
     }
 
-    public function testLeavesPagePagenameTemplate()
+    /**
+     * @test
+     */
+    public function testLeavesPagePagenameTemplate(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 1;
         $post->post_name = 'foo';
         $post->post_type = 'page';
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('page-meh');
 
@@ -114,19 +127,21 @@ final class BranchPageTest extends TestCase
         static::assertSame(['page-meh', 'page-bar', 'page-1', 'page'], $branch->leaves($query));
     }
 
-    public function testLeavesPagePagenameTemplateFolder()
+    /**
+     * @test
+     */
+    public function testLeavesPagePagenameTemplateFolder(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 1;
         $post->post_name = 'foo';
         $post->post_type = 'page';
 
         $query = new \WP_Query([], $post, ['pagename' => 'bar']);
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('page-templates/page-meh');
 
@@ -137,11 +152,14 @@ final class BranchPageTest extends TestCase
         static::assertSame($expected, $branch->leaves($query));
     }
 
-    public function testPageNameReturnTemplateIfNoPagename()
+    /**
+     * @test
+     */
+    public function testPageNameReturnTemplateIfNoPagename(): void
     {
         Functions\when('sanitize_title')->alias('strtolower');
 
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 1;
         $post->post_name = '';
         $post->post_title = 'foo';
@@ -149,10 +167,9 @@ final class BranchPageTest extends TestCase
 
         $query = new \WP_Query(['is_preview' => true], $post, ['page_id' => 1, 'pagename' => '']);
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('page-foo');
 

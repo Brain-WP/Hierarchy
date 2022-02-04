@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,56 +9,80 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Functional\Finder;
 
 use Brain\Monkey\Functions;
 use Brain\Hierarchy\Finder\SymfonyFinderAdapter;
 use Brain\Hierarchy\Tests\TestCase;
+use Symfony\Component\Finder\Finder;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class SymfonyFinderAdapterTest extends TestCase
+class SymfonyFinderAdapterTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
         parent::setUp();
-        Functions\when('trailingslashit')->alias(function ($str) {
-            return rtrim($str, '\\/').'/';
+        Functions\when('get_stylesheet_directory')->alias(static function (): string {
+            return getenv('HIERARCHY_TESTS_BASEPATH') . '/files';
         });
-        Functions\when('get_stylesheet_directory')->alias(function () {
-            return getenv('HIERARCHY_TESTS_BASEPATH').'/files';
-        });
-        Functions\when('get_template_directory')->alias(function () {
-            return getenv('HIERARCHY_TESTS_BASEPATH').'/files';
+        Functions\when('get_template_directory')->alias(static function (): string {
+            return getenv('HIERARCHY_TESTS_BASEPATH') . '/files';
         });
     }
 
-    public function testFind()
+    /**
+     * @test
+     */
+    public function testFind(): void
     {
-        $template = realpath(getenv('HIERARCHY_TESTS_BASEPATH').'/files/index.php');
+        $finder = new SymfonyFinderAdapter($this->factoryFinder());
 
-        $finder = new SymfonyFinderAdapter();
+        $template = realpath(getenv('HIERARCHY_TESTS_BASEPATH') . '/files/index.php');
 
         static::assertSame($template, $finder->find('index', 'index'));
     }
 
-    public function testFindFirst()
+    /**
+     * @test
+     */
+    public function testFindFirst(): void
     {
-        $template = realpath(getenv('HIERARCHY_TESTS_BASEPATH').'/files/another.php');
+        $finder = new SymfonyFinderAdapter($this->factoryFinder());
 
-        $finder = new SymfonyFinderAdapter();
+        $template = realpath(getenv('HIERARCHY_TESTS_BASEPATH') . '/files/singular.php');
 
-        static::assertSame($template, $finder->findFirst(['foo', 'another', 'index'], 'index'));
+        static::assertSame($template, $finder->findFirst(['foo', 'singular', 'index'], 'index'));
     }
 
-    public function testFindFirstFolders()
+    /**
+     * @test
+     */
+    public function testFindFirstFolders(): void
     {
-        $template = realpath(getenv('HIERARCHY_TESTS_BASEPATH').'/files/it/page.php');
+        $finder = new SymfonyFinderAdapter($this->factoryFinder());
 
-        $finder = new SymfonyFinderAdapter();
+        $template = realpath(getenv('HIERARCHY_TESTS_BASEPATH') . '/files/it_IT/single.php');
 
-        static::assertSame($template, $finder->findFirst(['foo', 'it/page', 'index'], 'page'));
+        static::assertSame($template, $finder->findFirst(['foo', 'it_IT/single', 'index'], 'page'));
+    }
+
+    /**
+     * @return Finder
+     */
+    private function factoryFinder(): Finder
+    {
+        return Finder::create()
+            ->in([get_stylesheet_directory(), get_template_directory()])
+            ->files()
+            ->ignoreDotFiles(true)
+            ->ignoreUnreadableDirs(true);
     }
 }

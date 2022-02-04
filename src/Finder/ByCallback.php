@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Finder;
 
 /**
@@ -16,9 +19,9 @@ namespace Brain\Hierarchy\Finder;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class CallbackTemplateFinder implements TemplateFinderInterface
+class ByCallback implements TemplateFinder
 {
-    use FindFirstTemplateTrait;
+    use FindFirstTrait;
 
     /**
      * @var callable
@@ -34,12 +37,14 @@ final class CallbackTemplateFinder implements TemplateFinderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $template
+     * @param string $type
+     * @return string
      */
-    public function find($template, $type)
+    public function find(string $template, string $type): string
     {
         $callback = $this->finder;
 
-        return $callback($template, $type);
+        return (string)$callback($template, $type);
     }
 }

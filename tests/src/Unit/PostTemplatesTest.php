@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,8 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Brain\Hierarchy\Tests\Unit;
+declare(strict_types=1);
 
+namespace Brain\Hierarchy\Tests\Unit;
 
 use Brain\Hierarchy\PostTemplates;
 use Brain\Hierarchy\Tests\TestCase;
@@ -21,8 +23,10 @@ use Brain\Monkey\Functions;
  */
 class PostTemplatesTest extends TestCase
 {
-
-    public function testEmptyPostReturnEmptyString()
+    /**
+     * @test
+     */
+    public function testEmptyPostReturnEmptyString(): void
     {
         $postTemplates = new PostTemplates();
 
@@ -33,7 +37,10 @@ class PostTemplatesTest extends TestCase
         static::assertSame('', $postTemplates->findFor($post));
     }
 
-    public function testPostWithoutTemplateReturnEmptyString()
+    /**
+     * @test
+     */
+    public function testPostWithoutTemplateReturnEmptyString(): void
     {
         $postTemplates = new PostTemplates();
 
@@ -42,14 +49,17 @@ class PostTemplatesTest extends TestCase
         $post->post_type = 'event';
 
         Functions\expect('get_page_template_slug')
-                 ->once()
-                 ->with($post)
-                 ->andReturn(false);
+            ->once()
+            ->with($post)
+            ->andReturn(false);
 
         static::assertSame('', $postTemplates->findFor($post));
     }
 
-    public function testPostWithUnexistentTemplateReturnEmptyString()
+    /**
+     * @test
+     */
+    public function testPostWithNonexistentTemplateReturnEmptyString(): void
     {
         $postTemplates = new PostTemplates();
 
@@ -58,39 +68,31 @@ class PostTemplatesTest extends TestCase
         $post->post_type = 'event';
 
         Functions\expect('get_page_template_slug')
-                 ->once()
-                 ->with($post)
-                 ->andReturn('foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->once()
-                 ->with('foo.php')
-                 ->andReturn('foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->once()
-                 ->with('bar.php')
-                 ->andReturn('bar.php');
+            ->once()
+            ->with($post)
+            ->andReturn('foo.php');
 
         Functions\expect('validate_file')
-                 ->once()
-                 ->with('foo.php')
-                 ->andReturn(0);
+            ->once()
+            ->with('foo.php')
+            ->andReturn(0);
 
         $theme = \Mockery::mock(\WP_Theme::class);
-        $theme->shouldReceive('get_page_templates')
-              ->once()
-              ->with(null, 'event')
-              ->andReturn(['bar.php' => 'Bar']);
+        $theme->expects('get_page_templates')
+            ->with(null, 'event')
+            ->andReturn(['bar.php' => 'Bar']);
 
         Functions\expect('wp_get_theme')
-                 ->once()
-                 ->andReturn($theme);
+            ->once()
+            ->andReturn($theme);
 
         static::assertSame('', $postTemplates->findFor($post));
     }
 
-    public function testPostWithValidTemplateReturnItsName()
+    /**
+     * @test
+     */
+    public function testPostWithValidTemplateReturnItsName(): void
     {
         $postTemplates = new PostTemplates();
 
@@ -99,42 +101,32 @@ class PostTemplatesTest extends TestCase
         $post->post_type = 'event';
 
         Functions\expect('get_page_template_slug')
-                 ->once()
-                 ->with($post)
-                 ->andReturn('foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->atLeast()
-                 ->once()
-                 ->with('foo.php')
-                 ->andReturn('foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->atLeast()
-                 ->once()
-                 ->with('bar.php')
-                 ->andReturn('bar.php');
+            ->once()
+            ->with($post)
+            ->andReturn('foo.php');
 
         Functions\expect('validate_file')
-                 ->atLeast()
-                 ->once()
-                 ->with('foo.php')
-                 ->andReturn(0);
+            ->atLeast()
+            ->once()
+            ->with('foo.php')
+            ->andReturn(0);
 
         $theme = \Mockery::mock(\WP_Theme::class);
-        $theme->shouldReceive('get_page_templates')
-              ->once()
-              ->with(null, 'event')
-              ->andReturn(['foo.php' => 'Foo', 'bar.php' => 'Bar']);
+        $theme->expects('get_page_templates')
+            ->with(null, 'event')
+            ->andReturn(['foo.php' => 'Foo', 'bar.php' => 'Bar']);
 
         Functions\expect('wp_get_theme')
-                 ->once()
-                 ->andReturn($theme);
+            ->once()
+            ->andReturn($theme);
 
         static::assertSame('foo', $postTemplates->findFor($post));
     }
 
-    public function testPostWithValidTemplateReturnItsNameAndDir()
+    /**
+     * @test
+     */
+    public function testPostWithValidTemplateReturnItsNameAndDir(): void
     {
         $postTemplates = new PostTemplates();
 
@@ -143,42 +135,32 @@ class PostTemplatesTest extends TestCase
         $post->post_type = 'event';
 
         Functions\expect('get_page_template_slug')
-                 ->once()
-                 ->with($post)
-                 ->andReturn('path/foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->atLeast()
-                 ->once()
-                 ->with('path/foo.php')
-                 ->andReturn('path/foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->atLeast()
-                 ->once()
-                 ->with('bar.php')
-                 ->andReturn('bar.php');
+            ->once()
+            ->with($post)
+            ->andReturn('path/foo.php');
 
         Functions\expect('validate_file')
-                 ->atLeast()
-                 ->once()
-                 ->with('path/foo.php')
-                 ->andReturn(0);
+            ->atLeast()
+            ->once()
+            ->with('path/foo.php')
+            ->andReturn(0);
 
         $theme = \Mockery::mock(\WP_Theme::class);
-        $theme->shouldReceive('get_page_templates')
-              ->once()
-              ->with(null, 'event')
-              ->andReturn(['path/foo.php' => 'Foo', 'bar.php' => 'Bar']);
+        $theme->expects('get_page_templates')
+            ->with(null, 'event')
+            ->andReturn(['path/foo.php' => 'Foo', 'bar.php' => 'Bar']);
 
         Functions\expect('wp_get_theme')
-                 ->once()
-                 ->andReturn($theme);
+            ->once()
+            ->andReturn($theme);
 
         static::assertSame('path/foo', $postTemplates->findFor($post));
     }
 
-    public function testTemplatesAreReadOnceFromTheme()
+    /**
+     * @test
+     */
+    public function testTemplatesAreReadOnceFromTheme(): void
     {
         $postTemplates = new PostTemplates();
 
@@ -187,38 +169,25 @@ class PostTemplatesTest extends TestCase
         $post->post_type = 'event';
 
         Functions\expect('get_page_template_slug')
-                 ->atLeast()
-                 ->once()
-                 ->with($post)
-                 ->andReturn('path/foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->atLeast()
-                 ->once()
-                 ->with('path/foo.php')
-                 ->andReturn('path/foo.php');
-
-        Functions\expect('wp_normalize_path')
-                 ->atLeast()
-                 ->once()
-                 ->with('bar.php')
-                 ->andReturn('bar.php');
+            ->atLeast()
+            ->once()
+            ->with($post)
+            ->andReturn('path/foo.php');
 
         Functions\expect('validate_file')
-                 ->atLeast()
-                 ->once()
-                 ->with('path/foo.php')
-                 ->andReturn(0);
+            ->atLeast()
+            ->once()
+            ->with('path/foo.php')
+            ->andReturn(0);
 
         $theme = \Mockery::mock(\WP_Theme::class);
-        $theme->shouldReceive('get_page_templates')
-              ->once()
-              ->with(null, 'event')
-              ->andReturn(['path/foo.php' => 'Foo', 'bar.php' => 'Bar']);
+        $theme->expects('get_page_templates')
+            ->with(null, 'event')
+            ->andReturn(['path/foo.php' => 'Foo', 'bar.php' => 'Bar']);
 
         Functions\expect('wp_get_theme')
-                 ->once()
-                 ->andReturn($theme);
+            ->once()
+            ->andReturn($theme);
 
         $postTemplates->findFor($post);
         $postTemplates->findFor($post);

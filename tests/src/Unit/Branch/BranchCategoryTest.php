@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
@@ -17,9 +20,12 @@ use Brain\Hierarchy\Tests\TestCase;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchCategoryTest extends TestCase
+class BranchCategoryTest extends TestCase
 {
-    public function testLeavesNoCategory()
+    /**
+     * @test
+     */
+    public function testLeavesNoCategory(): void
     {
         $query = new \WP_Query([], null);
         $branch = new BranchCategory();
@@ -27,9 +33,12 @@ final class BranchCategoryTest extends TestCase
         static::assertSame(['category'], $branch->leaves($query));
     }
 
-    public function testLeaves()
+    /**
+     * @test
+     */
+    public function testLeaves(): void
     {
-        $category = (object) ['slug' => 'foo', 'term_id' => 123];
+        $category = (object)['slug' => 'foo', 'term_id' => 123];
         $query = new \WP_Query([], $category);
 
         $branch = new BranchCategory();

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<ruleset>
+
+    <file>./src</file>
+    <file>./tests/src</file>
+
+    <arg value="sp"/>
+    <arg name="colors"/>
+    <config name="testVersion" value="7.1-"/>
+
+    <rule ref="Inpsyde"/>
+
+    <rule ref="Inpsyde.CodeQuality.Psr4">
+        <properties>
+            <property
+                name="psr4"
+                type="array"
+                value="Brain\Hierarchy=>src,Brain\Hierarchy\Tests=>tests/src"/>
+        </properties>
+    </rule>
+
+</ruleset>
+

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,86 +9,56 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Finder;
 
 use Symfony\Component\Finder\Finder;
 
 /**
  * A Symfony Finder adapter. Hierarchy does not ship with Symfony Finder (only on development)
- * so it have to be installed separately.
+ * so it has to be installed separately.
  *
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class SymfonyFinderAdapter implements TemplateFinderInterface
+final class SymfonyFinderAdapter implements TemplateFinder
 {
-    use FindFirstTemplateTrait;
+    use FindFirstTrait;
 
     /**
-     * @var \Symfony\Component\Finder\Finder
+     * @var Finder
      */
     private $finder;
 
     /**
-     * @param \Symfony\Component\Finder\Finder $finder
+     * @param Finder $finder
      */
-    public function __construct(Finder $finder = null)
+    public function __construct(Finder $finder)
     {
-        if (is_null($finder)) {
-            $stylesheet = trailingslashit(get_stylesheet_directory());
-            $template = trailingslashit(get_template_directory());
-            $folders = [$stylesheet];
-            ($stylesheet !== $template) and $folders[] = $template;
-            $finder = (new Finder())
-                ->in($folders)
-                ->ignoreDotFiles(true)
-                ->ignoreUnreadableDirs(true)
-                ->followLinks();
-        }
-
         $this->finder = $finder;
     }
 
     /**
-     * @param \Symfony\Component\Finder\Finder $finder
-     *
-     * @return \Brain\Hierarchy\Finder\SymfonyFinderAdapter
+     * @param string $template
+     * @param string $type
+     * @return string
      */
-    public function withSymfonyFinder(Finder $finder)
+    public function find(string $template, string $type): string
     {
-        $clone = clone $this;
-        $clone->finder = $finder;
-
-        return $clone;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function find($template, $type)
-    {
-        $name = trim(str_replace('\\', '/', $template), '/');
-        $depth = substr_count($name, '/');
-
+        $name = untrailingslashit(wp_normalize_path($template));
         $finder = clone $this->finder;
-        $finder = $finder->depth("== {$depth}");
 
-        if ($depth) {
-            $dir = dirname($name);
-            $finder = $finder->path($dir);
+        if (substr_count($name, '/')) {
+            $finder = $finder->path(dirname($name));
             $name = basename($name);
         }
 
-        $quotedName = preg_quote($name, '~');
-        /** @var \Iterator $iterator */
-        $iterator = $finder->files()->name("~^{$quotedName}(\.[\w]{1,})?$~")->getIterator();
-
-        if (!iterator_count($iterator) > 0) {
-            return '';
+        /** @var \SplFileInfo $item */
+        foreach ($finder->files()->name("{$name}*") as $item) {
+            return (string)$item->getRealPath();
         }
 
-        $array = iterator_to_array($iterator);
-
-        return reset($array)->getRealPath();
+        return '';
     }
 }

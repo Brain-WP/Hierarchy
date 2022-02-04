@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Branch;
 
 use Brain\Hierarchy\PostTemplates;
@@ -16,45 +19,46 @@ use Brain\Hierarchy\PostTemplates;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchSingle implements BranchInterface
+final class BranchSingle implements Branch
 {
     /**
-     * @var \Brain\Hierarchy\PostTemplates
+     * @var PostTemplates
      */
     private $postTemplates;
 
     /**
-     * @param \Brain\Hierarchy\PostTemplates|null $postTemplates
+     * @param PostTemplates|null $postTemplates
      */
-    public function __construct(PostTemplates $postTemplates = null)
+    public function __construct(?PostTemplates $postTemplates = null)
     {
         $this->postTemplates = $postTemplates ?: new PostTemplates();
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'single';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return $query->is_single();
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
-        /** @var \WP_Post $post */
         $post = $query->get_queried_object();
-        if (!$post instanceof \WP_Post || ! $post->ID) {
+        if (!($post instanceof \WP_Post) || !$post->ID) {
             return ['single'];
         }
 

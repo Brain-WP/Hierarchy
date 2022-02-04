@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,11 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit;
 
 use Brain\Hierarchy\Tests\TestCase;
 use Brain\Hierarchy\Tests\Stubs;
-use Brain\Hierarchy\Branch\BranchInterface;
 use Brain\Hierarchy\Hierarchy;
 use Brain\Monkey\Filters;
 
@@ -22,29 +24,26 @@ use Brain\Monkey\Filters;
  */
 class HierarchyTest extends TestCase
 {
-
-    public function testParse()
+    /**
+     * @test
+     */
+    public function testFilteredBranches(): void
     {
-
-        $hierarchy = new Hierarchy();
-
         $branches = [
-            Stubs\BranchStubFoo::class,  // leaves: ['foo', 'bar']
-            Stubs\BranchStubBar::class,  // leaves: ['baz', 'bar']
-            Stubs\BranchStubBar2::class, // should be skipped because has same name of previous
+            Stubs\BranchStubFoo::class,  // leaves: foo, bar
+            Stubs\BranchStubBar::class,  // leaves: baz, bar
+            Stubs\BranchStubBar2::class, // should be skipped because has the same name as previous
             Stubs\BranchStubBaz::class,  // should be skipped because its is() always returns false
         ];
 
-        Filters\expectApplied('brain.hierarchy.branches')->once()->andReturn($branches);
+        Filters\expectApplied('brain.hierarchy.branches')->twice()->andReturn($branches);
 
         $query = new \WP_Query();
+        $hierarchy = new Hierarchy();
 
-        /** @var \stdClass $data */
-        $data = $this->callPrivateFunc('parse', $hierarchy, [$query]);
-
-        $expected = [
-            'foo' => (new Stubs\BranchStubFoo())->leaves($query),
-            'bar' => (new Stubs\BranchStubBar())->leaves($query),
+        $expectedNested = [
+            'foo' => ['foo', 'bar'],
+            'bar' => ['baz', 'bar'],
             'index' => ['index'],
         ];
 
@@ -55,28 +54,26 @@ class HierarchyTest extends TestCase
             'index',
         ];
 
-        static::assertInstanceOf(\stdClass::class, $data);
-        static::assertSame($expected, $data->hierarchy);
-        static::assertSame($expectedFlat, $data->templates);
+        static::assertSame($expectedNested, $hierarchy->hierarchy($query));
+        static::assertSame($expectedFlat, $hierarchy->templates($query));
     }
 
-    public function testBranches()
+    /**
+     * @test
+     */
+    public function testHierarchy(): void
     {
-        $hierarchy = new Hierarchy();
-        $classes = $this->getPrivateStaticVar('branches', $hierarchy);
-
-        foreach ($classes as $class) {
-            static::assertInstanceOf(BranchInterface::class, new $class());
-        }
+        static::assertSame(
+            ['index' => ['index']],
+            (new Hierarchy())->hierarchy(new \WP_Query())
+        );
     }
 
-    public function testGetHierarchy()
+    /**
+     * @test
+     */
+    public function testTemplates(): void
     {
-        static::assertSame(['index' => ['index']], (new Hierarchy())->getHierarchy(new \WP_Query()));
-    }
-
-    public function testGetTemplates()
-    {
-        static::assertSame(['index'], (new Hierarchy())->getTemplates(new \WP_Query()));
+        static::assertSame(['index'], (new Hierarchy())->templates(new \WP_Query()));
     }
 }

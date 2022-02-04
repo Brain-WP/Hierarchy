@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Finder;
 
 /**
@@ -16,23 +19,24 @@ namespace Brain\Hierarchy\Finder;
  *
  * @method string find(string $template, string $type)
  */
-trait FindFirstTemplateTrait
+trait FindFirstTrait
 {
     /**
-     * @param array  $templates
+     * @param array $templates
      * @param string $type
-     *
      * @return string
      *
-     * @see \Brain\Hierarchy\Finder\TemplateFinderInterface::findFirst()
+     * @see TemplateFinder::findFirst()
      */
-    public function findFirst(array $templates, $type)
+    public function findFirst(array $templates, string $type): string
     {
-        $found = '';
-        while (!empty($templates) && $found === '') {
-            $found = $this->find(array_shift($templates), $type) ?: '';
+        foreach ($templates as $template) {
+            $found = is_string($template) ? $this->find($template, $type) : null;
+            if ($found) {
+                return $found;
+            }
         }
 
-        return $found;
+        return '';
     }
 }

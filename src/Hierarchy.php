@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,7 +9,11 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy;
+
+use Brain\Hierarchy\Branch;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
@@ -16,151 +21,223 @@ namespace Brain\Hierarchy;
  */
 class Hierarchy
 {
+    public const FILTERABLE = 1;
+    public const NOT_FILTERABLE = 2;
 
-    const FILTERABLE = 1;
-    const NOT_FILTERABLE = 2;
+    private const BRANCHES = [
+        'embed' => Branch\BranchEmbed::class,
+        '404' => Branch\Branch404::class,
+        'search' => Branch\BranchSearch::class,
+        'frontpage' => Branch\BranchFrontPage::class,
+        'home' => Branch\BranchHome::class,
+        'post-type-archive' => Branch\BranchPostTypeArchive::class,
+        'taxonomy' => Branch\BranchTaxonomy::class,
+        'attachment' => Branch\BranchAttachment::class,
+        'single' => Branch\BranchSingle::class,
+        'page' => Branch\BranchPage::class,
+        'singular' => Branch\BranchSingular::class,
+        'category' => Branch\BranchCategory::class,
+        'tag' => Branch\BranchTag::class,
+        'author' => Branch\BranchAuthor::class,
+        'date' => Branch\BranchDate::class,
+        'archive' => Branch\BranchArchive::class,
+        'paged' => Branch\BranchPaged::class,
+    ];
 
     /**
      * @var int
      */
-    private $flags = 0;
-
-    /**
-     * @var array
-     */
-    private static $branches = [
-        'embed'             => Branch\BranchEmbed::class,
-        '404'               => Branch\Branch404::class,
-        'search'            => Branch\BranchSearch::class,
-        'frontpage'         => Branch\BranchFrontPage::class,
-        'home'              => Branch\BranchHome::class,
-        'post-type-archive' => Branch\BranchPostTypeArchive::class,
-        'taxonomy'          => Branch\BranchTaxonomy::class,
-        'attachment'        => Branch\BranchAttachment::class,
-        'single'            => Branch\BranchSingle::class,
-        'page'              => Branch\BranchPage::class,
-        'singular'          => Branch\BranchSingular::class,
-        'category'          => Branch\BranchCategory::class,
-        'tag'               => Branch\BranchTag::class,
-        'author'            => Branch\BranchAuthor::class,
-        'date'              => Branch\BranchDate::class,
-        'archive'           => Branch\BranchArchive::class,
-        'paged'             => Branch\BranchPaged::class,
-    ];
+    private $flags;
 
     /**
      * @param int $flags
      */
-    public function __construct($flags = self::FILTERABLE)
+    public function __construct(int $flags = self::FILTERABLE)
     {
-        $this->flags = is_int($flags) ? $flags : 0;
+        $this->flags = $flags;
     }
 
     /**
-     * Get hierarchy.
-     *
-     * @param \WP_Query $query
-     *
-     * @return array
+     * @param \WP_Query|null $query
+     * @return array<string, list<string>>
      */
-    public function getHierarchy(\WP_Query $query = null)
+    public function hierarchy(?\WP_Query $query = null): array
     {
-        return $this->parse($query)->hierarchy;
+        return $this->parse($query)['hierarchy'];
     }
 
     /**
      * Get flatten hierarchy.
      *
-     * @param \WP_Query $query
-     *
-     * @return array
+     * @param \WP_Query|null $query
+     * @return list<string>
      */
-    public function getTemplates(\WP_Query $query = null)
+    public function templates(?\WP_Query $query = null): array
     {
-        return $this->parse($query)->templates;
+        return $this->parse($query)['templates'];
+    }
+
+    /**
+     * @deprecated Use Hierarchy::templates() instead.
+     *
+     * @param \WP_Query|null $query
+     * @return array
+     *
+     * phpcs:disable Inpsyde.CodeQuality.NoAccessors
+     */
+    public function getTemplates(?\WP_Query $query = null): array
+    {
+        // phpcs:enable Inpsyde.CodeQuality.NoAccessors
+        return $this->templates($query);
+    }
+
+    /**
+     * @deprecated Use Hierarchy::hierarchy() instead.
+     *
+     * @param \WP_Query|null $query
+     * @return array
+     *
+     * phpcs:disable Inpsyde.CodeQuality.NoAccessors
+     */
+    public function getHierarchy(?\WP_Query $query = null): array
+    {
+        // phpcs:enable Inpsyde.CodeQuality.NoAccessors
+        return $this->hierarchy($query);
     }
 
     /**
      * Parse all branches.
      *
+     * @param \WP_Query|null $query
+     * @return array{
+     *     hierarchy: array<string, list<string>>,
+     *     templates: list<string>,
+     *     query: \WP_Query|null
+     * }
+     */
+    private function parse(?\WP_Query $query = null): array
+    {
+        global $wp_query;
+        if (!$query && ($wp_query instanceof \WP_Query)) {
+            $query = $wp_query;
+        }
+
+        $isFilterable = ($this->flags & self::FILTERABLE) === self::FILTERABLE;
+
+        if (!$query) {
+            $indexLeaves = $this->indexLeaves($isFilterable);
+            $hierarchy = ['index' => $indexLeaves];
+            $templates = $indexLeaves;
+
+            return compact('hierarchy', 'templates', 'query');
+        }
+
+        $hierarchy = [];
+        $templates = [];
+
+        foreach ($this->allBranches($isFilterable) as $branch) {
+            $branchObject = is_string($branch) ? new $branch() : $branch;
+            if (!$branchObject->is($query)) {
+                continue;
+            }
+
+            $name = $branchObject->name();
+            if (isset($hierarchy[$name])) {
+                continue;
+            }
+
+            $leaves = $this->parseBranch($branchObject, $query, $isFilterable);
+            $hierarchy[$name] = $leaves;
+            $templates = array_merge($templates, $leaves);
+        }
+
+        $hierarchy['index'] = $this->indexLeaves($isFilterable);
+        $templates = array_values(array_unique(array_merge($templates, $hierarchy['index'])));
+
+        return compact('hierarchy', 'templates', 'query');
+    }
+
+    /**
+     * @param bool $isFilterable
+     * @return list<string>
+     */
+    private function indexLeaves(bool $isFilterable): array
+    {
+        if (!$isFilterable) {
+            return ['index'];
+        }
+
+        $leaves = $this->filterStringList('index_template_hierarchy', ['index']);
+        in_array('index', $leaves, true) or $leaves[] = 'index';
+
+        return $leaves;
+    }
+
+    /**
+     * @return list<class-string<Branch\Branch>|Branch\Branch>
+     */
+    private function allBranches(bool $isFilterable): array
+    {
+        $default = array_values(self::BRANCHES);
+        if (!$isFilterable) {
+            return $default;
+        }
+
+        $filtered = apply_filters('brain.hierarchy.branches', $default);
+        if (!is_array($filtered)) {
+            return $default;
+        }
+
+        $parsed = [];
+        $done = [];
+        foreach ($filtered as $branch) {
+            if (
+                (is_string($branch) && is_subclass_of($branch, Branch\Branch::class, true))
+                || ($branch instanceof Branch\Branch)
+            ) {
+                $key = is_string($branch) ? $branch : get_class($branch);
+                ($done[$key] ?? false) or $parsed[] = $branch;
+                $done[$key] = true;
+            }
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * @param Branch\Branch $branch
      * @param \WP_Query $query
-     *
-     * @return \stdClass
+     * @param bool $filter
+     * @return list<string>
      */
-    private function parse(\WP_Query $query = null)
+    private function parseBranch(Branch\Branch $branch, \WP_Query $query, bool $filter): array
     {
-        (is_null($query) && isset($GLOBALS['wp_query'])) and $query = $GLOBALS['wp_query'];
-
-        $data = (object)['hierarchy' => [], 'templates' => [], 'query' => $query];
-
-        $branches = self::$branches;
-
-        // make the branches filterable, but assuring each item still implement branch interface
-        if ($this->flags & self::FILTERABLE) {
-            $branches = array_filter(
-                (array)apply_filters('brain.hierarchy.branches', $branches),
-                function ($branch) {
-                    return is_subclass_of($branch, Branch\BranchInterface::class, true);
-                }
-            );
+        $leaves = $branch->leaves($query);
+        if (!$filter) {
+            return $leaves;
         }
 
-        // removed indexes, we added them to make filtering easier
-        $branches = array_values($branches);
-
-        if ($query instanceof \WP_Query) {
-            $data = array_reduce($branches, [$this, 'parseBranch'], $data);
-        }
-
-        $data->hierarchy = $this->addIndexLeaves($data->hierarchy);
-        $data->templates[] = 'index';
-        $data->templates = array_values(array_unique($data->templates));
-
-        return $data;
+        return $this->filterStringList($branch->name() . '_template_hierarchy', $leaves);
     }
 
     /**
-     * @param array $hierarchy
-     * @return array
+     * @param string $filter
+     * @param list<string> $default
+     * @return list<string>
      */
-    private function addIndexLeaves(array $hierarchy)
+    private function filterStringList(string $filter, array $default): array
     {
-        if (($this->flags & self::FILTERABLE) <= 0) {
-            $hierarchy['index'] = ['index'];
+        $filtered = apply_filters($filter, $default);
 
-            return $hierarchy;
+        if (!is_array($filtered)) {
+            return $default;
         }
 
-        $index_leaves = (array)apply_filters("index_template_hierarchy", ['index']);
-        $index_leaves = array_filter($index_leaves, 'is_string');
-
-        $hierarchy['index'] = array_filter($index_leaves);
-
-        return $hierarchy;
-    }
-
-    /**
-     * @param string    $branchClass
-     * @param \stdClass $data
-     *
-     * @return \stdClass
-     */
-    private function parseBranch(\stdClass $data, $branchClass)
-    {
-        /** @var \Brain\Hierarchy\Branch\BranchInterface $branch */
-        $branch = new $branchClass();
-        $name = $branch->name();
-        $isFilterable = ($this->flags & self::FILTERABLE) > 0;
-        // When branches are filterable, we need this for core compatibility.
-        $isFilterable and $name = preg_replace('|[^a-z0-9-]+|', '', $name);
-        if ($branch->is($data->query) && ! isset($data->hierarchy[$name])) {
-            $leaves = $branch->leaves($data->query);
-            // this filter was introduced in WP 4.7
-            $isFilterable and $leaves = apply_filters("{$name}_template_hierarchy", $leaves);
-            $data->hierarchy[$name] = $leaves;
-            $data->templates = array_merge($data->templates, $leaves);
+        $result = [];
+        foreach ($filtered as $filteredItem) {
+            (is_string($filteredItem) && $filteredItem) and $result[] = $filteredItem;
         }
 
-        return $data;
+        return $result ? array_values(array_unique($result)) : $default;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,64 +9,78 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit\Finder;
 
 use Brain\Monkey\Functions;
-use Brain\Hierarchy\Finder\CallbackTemplateFinder;
-use Brain\Hierarchy\Finder\LocalizedTemplateFinder;
+use Brain\Hierarchy\Finder\ByCallback;
+use Brain\Hierarchy\Finder\Localized;
 use Brain\Hierarchy\Tests\TestCase;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class LocalizedTemplateFinderTest extends TestCase
+class LocalizedTest extends TestCase
 {
-    public function setUp()
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
         parent::setUp();
-        Functions\when('get_stylesheet_directory')->alias(function () {
+        Functions\when('get_stylesheet_directory')->alias(static function (): string {
             return getenv('HIERARCHY_TESTS_BASEPATH');
         });
-        Functions\when('get_template_directory')->alias(function () {
+        Functions\when('get_template_directory')->alias(static function (): string {
             return getenv('HIERARCHY_TESTS_BASEPATH');
         });
-        Functions\when('get_locale')->alias(function () {
+        Functions\when('get_locale')->alias(static function (): string {
             return 'it_IT';
         });
     }
 
-    public function testFindNothing()
+    /**
+     * @test
+     */
+    public function testFindNothing(): void
     {
-        $callbackFinder = new CallbackTemplateFinder(function () {
+        $callbackFinder = new ByCallback(static function (): string {
             return '';
         });
-        $finder = new LocalizedTemplateFinder($callbackFinder);
+        $finder = new Localized($callbackFinder);
 
         static::assertSame('', $finder->find('foo', 'foo'));
     }
 
-    public function testFind()
+    /**
+     * @test
+     */
+    public function testFind(): void
     {
-        $path = getenv('HIERARCHY_TESTS_BASEPATH').'/files';
-        $callbackFinder = new CallbackTemplateFinder(function ($name) use ($path) {
+        $path = getenv('HIERARCHY_TESTS_BASEPATH') . '/files';
+        $callbackFinder = new ByCallback(static function (string $name) use ($path): string {
             return file_exists("{$path}/{$name}.php") ? "{$path}/{$name}.php" : '';
         });
 
-        $finder = new LocalizedTemplateFinder($callbackFinder);
+        $finder = new Localized($callbackFinder);
 
         static::assertSame("{$path}/it/page.php", $finder->find('page', 'page'));
         static::assertSame("{$path}/it_IT/single.php", $finder->find('single', 'single'));
     }
 
-    public function testFindFirst()
+    /**
+     * @test
+     */
+    public function testFindFirst(): void
     {
-        $path = getenv('HIERARCHY_TESTS_BASEPATH').'/files';
-        $callbackFinder = new CallbackTemplateFinder(function ($name) use ($path) {
+        $path = getenv('HIERARCHY_TESTS_BASEPATH') . '/files';
+        $callbackFinder = new ByCallback(static function (string $name) use ($path): string {
             return file_exists("{$path}/{$name}.php") ? "{$path}/{$name}.php" : '';
         });
 
-        $finder = new LocalizedTemplateFinder($callbackFinder);
+        $finder = new Localized($callbackFinder);
 
         static::assertSame(
             "{$path}/it/page.php",

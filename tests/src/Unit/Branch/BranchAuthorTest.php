@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,19 +9,23 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
 use Brain\Hierarchy\Branch\BranchAuthor;
 use Brain\Hierarchy\Tests\TestCase;
-use Mockery;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchAuthorTest extends TestCase
+class BranchAuthorTest extends TestCase
 {
-    public function testLeavesNoUser()
+    /**
+     * @test
+     */
+    public function testLeavesNoUser(): void
     {
         $branch = new BranchAuthor();
         $query = new \WP_Query([], null);
@@ -28,9 +33,12 @@ final class BranchAuthorTest extends TestCase
         static::assertSame(['author'], $branch->leaves($query));
     }
 
-    public function testLeaves()
+    /**
+     * @test
+     */
+    public function testLeaves(): void
     {
-        $user = Mockery::mock('\WP_User');
+        $user = \Mockery::mock('\WP_User');
         $user->ID = 12;
         $user->user_nicename = 'john_doe';
         $query = new \WP_Query([], $user);

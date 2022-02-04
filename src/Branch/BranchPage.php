@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Branch;
 
 use Brain\Hierarchy\PostTemplates;
@@ -16,46 +19,47 @@ use Brain\Hierarchy\PostTemplates;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchPage implements BranchInterface
+final class BranchPage implements Branch
 {
-
     /**
-     * @var \Brain\Hierarchy\PostTemplates
+     * @var PostTemplates
      */
     private $postTemplates;
 
     /**
-     * @param \Brain\Hierarchy\PostTemplates|null $postTemplates
+     * @param PostTemplates|null $postTemplates
      */
-    public function __construct(PostTemplates $postTemplates = null)
+    public function __construct(?PostTemplates $postTemplates = null)
     {
         $this->postTemplates = $postTemplates ?: new PostTemplates();
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'page';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return $query->is_page();
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         /** @var \WP_Post $post */
         $post = $query->get_queried_object();
-        $post instanceof \WP_Post or $post = new \WP_Post((object) ['ID' => 0]);
+        $post instanceof \WP_Post or $post = new \WP_Post((object)['ID' => 0]);
 
         $template = $this->postTemplates->findFor($post);
         $pagename = $query->get('pagename');
@@ -64,7 +68,7 @@ final class BranchPage implements BranchInterface
         $leaves = $template ? [$template] : [];
         $baseLeaves = $post->ID ? ["page-{$post->ID}", 'page'] : ['page'];
 
-        if (!$pagename) {
+        if (!$pagename || !is_string($pagename)) {
             return array_merge($leaves, $baseLeaves);
         }
 

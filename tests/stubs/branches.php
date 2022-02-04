@@ -10,111 +10,119 @@
 
 namespace Brain\Hierarchy\Tests\Stubs;
 
-use Brain\Hierarchy\Branch\BranchInterface;
+use Brain\Hierarchy\Branch\Branch;
 
-class BranchStubFoo implements BranchInterface
+class BranchStubFoo implements Branch
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'foo';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         return ['foo', 'bar'];
     }
 }
 
-class BranchStubBar implements BranchInterface
+class BranchStubBar implements Branch
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'bar';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         return ['baz', 'bar'];
     }
 }
 
-class BranchStubBar2 implements BranchInterface
+class BranchStubBar2 implements Branch
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'bar';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         return ['a', 'b', 'c'];
     }
 }
 
-class BranchStubBaz implements BranchInterface
+class BranchStubBaz implements Branch
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'baz';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return false;
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return array
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         return ['1', '2', 3];
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,77 +9,40 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests;
 
-use Andrew\StaticProxy;
-use PHPUnit_Framework_TestCase;
 use Brain\Monkey;
-use Andrew\Proxy;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-class TestCase extends PHPUnit_Framework_TestCase
+class TestCase extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    /**
+     * @return void
+     */
+    protected function setUp(): void
     {
         parent::setUp();
         Monkey\setUp();
+
+        Monkey\Functions\when('sanitize_file_name')->alias(static function (string $path): string {
+            return rtrim(str_replace(' ', '-', $path), '._-');
+        });
+        Monkey\Functions\when('wp_normalize_path')->alias(static function (string $path): string {
+            return str_replace('\\', '/', $path);
+        });
     }
 
-    protected function tearDown()
+    /**
+     * @return void
+     */
+    protected function tearDown(): void
     {
         Monkey\tearDown();
         parent::tearDown();
-    }
-
-    /**
-     * @param string $var
-     * @param mixed  $value
-     * @param object $object
-     */
-    protected function setPrivateVar($var, $value, $object)
-    {
-        $proxy = new Proxy($object);
-        $proxy->{$var} = $value;
-    }
-
-    /**
-     * @param string $var
-     * @param object $object
-     *
-     * @return mixed
-     */
-    protected function getPrivateStaticVar($var, $object)
-    {
-        $proxy = new StaticProxy(get_class($object));
-
-        return $proxy->{$var};
-    }
-
-    /**
-     * @param string $var
-     * @param mixed  $value
-     * @param object $object
-     */
-    protected function setPrivateStaticVar($var, $value, $object)
-    {
-        $proxy = new StaticProxy(get_class($object));
-        $proxy->{$var} = $value;
-    }
-
-    /**
-     * @param string $method
-     * @param object $object
-     * @param array  $args
-     *
-     * @return mixed
-     */
-    protected function callPrivateFunc($method, $object, $args = [])
-    {
-        $callback = [new Proxy($object), $method];
-
-        return $callback(...$args);
     }
 }

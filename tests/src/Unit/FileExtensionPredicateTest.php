@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Brain\Hierarchy\Tests\Unit;
 
@@ -20,28 +23,18 @@ use Brain\Hierarchy\Tests\TestCase;
 class FileExtensionPredicateTest extends TestCase
 {
     /**
+     * @test
      * @dataProvider parseExtensionsProvider
      */
-    public function testParseExtensions($input, $output)
+    public function testParseExtensions(string $input, array $output): void
     {
-        static::assertEquals($output, $extension = FileExtensionPredicate::parseExtensions($input));
+        static::assertEquals($output, FileExtensionPredicate::parseExtensions($input));
     }
 
     /**
-     * @return array
+     * @test
      */
-    public function parseExtensionsProvider()
-    {
-        return [
-            // $input, $output
-            ['php', ['php']],
-            ["\0\n\t .PhP \0\n\t", ['php']],
-            ['twig|php|html', ['twig', 'php', 'html']],
-            ["\nTWIG | php\t | .Html", ['twig', 'php', 'html']],
-        ];
-    }
-
-    public function testSingleExtension()
+    public function testSingleExtension(): void
     {
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate('php');
@@ -52,7 +45,10 @@ class FileExtensionPredicateTest extends TestCase
         static::assertFalse($predicate('.phtml'));
     }
 
-    public function testSingleExtensionNormalize()
+    /**
+     * @test
+     */
+    public function testSingleExtensionNormalize(): void
     {
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate(' .pHP ');
@@ -62,7 +58,10 @@ class FileExtensionPredicateTest extends TestCase
         static::assertFalse($predicate('foo.phtml'));
     }
 
-    public function testMultiExtensionString()
+    /**
+     * @test
+     */
+    public function testMultiExtensionString(): void
     {
         /** @var callable $predicate */
         $predicate = new FileExtensionPredicate(' php | PHTML | .inc ');
@@ -74,15 +73,31 @@ class FileExtensionPredicateTest extends TestCase
         static::assertFalse($predicate('foo.twig'));
     }
 
-    public function testMultiExtensionArray()
+    /**
+     * @test
+     */
+    public function testMultiExtensionArray(): void
     {
         /** @var callable $predicate */
-        $predicate = new FileExtensionPredicate([' php ', 'PHTML ', ' .inc']);
+        $predicate = new FileExtensionPredicate(' php ', 'PHTML ', ' .inc');
 
         static::assertTrue($predicate('foo.php'));
         static::assertTrue($predicate('foo.PHP'));
         static::assertTrue($predicate('foo.phtml'));
         static::assertTrue($predicate('foo.inc'));
         static::assertFalse($predicate('foo.twig'));
+    }
+
+    /**
+     * @return list<array{string, list<string>}>
+     */
+    public function parseExtensionsProvider(): array
+    {
+        return [
+            ['php', ['php']],
+            ["\0\n\t .PhP \0\n\t", ['php']],
+            ['twig|php|html', ['twig', 'php', 'html']],
+            ["\nTWIG | php\t | .Html", ['twig', 'php', 'html']],
+        ];
     }
 }

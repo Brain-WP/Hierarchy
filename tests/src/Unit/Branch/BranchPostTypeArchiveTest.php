@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,27 +9,33 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
 use Brain\Monkey\Functions;
 use Brain\Hierarchy\Branch\BranchPostTypeArchive;
 use Brain\Hierarchy\Tests\TestCase;
-use Mockery;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchPostTypeArchiveTest extends TestCase
+class BranchPostTypeArchiveTest extends TestCase
 {
-    public function testLeavesWithArchiveCpt()
+    /**
+     * @test
+     */
+    public function testLeavesWithArchiveCpt(): void
     {
-        $query = Mockery::mock('\WP_Query');
-        $query->shouldReceive('is_post_type_archive')->andReturn(true);
-        $query->shouldReceive('get')->with('post_type')->andReturn('my_cpt');
-        Functions\expect('get_post_type_object')
-            ->with('my_cpt')
-            ->andReturn((object) ['has_archive' => true]);
+        /** @var \WP_Query|\Mockery\MockInterface $query */
+        $query = \Mockery::mock('\WP_Query');
+        $query->expects('is_post_type_archive')->andReturn(true);
+        $query->shouldReceive('get')->with('post_type')->zeroOrMoreTimes()->andReturn('my_cpt');
+
+        $cpt = \Mockery::mock('\WP_Post_Type');
+        $cpt->has_archive = true;
+        Functions\expect('get_post_type_object')->with('my_cpt')->andReturn($cpt);
 
         $branch = new BranchPostTypeArchive();
 
@@ -36,14 +43,18 @@ final class BranchPostTypeArchiveTest extends TestCase
         static::assertSame(['archive-my_cpt', 'archive'], $branch->leaves($query));
     }
 
-    public function testLeavesWithNoArchiveCpt()
+    /**
+     * @test
+     */
+    public function testLeavesWithNoArchiveCpt(): void
     {
-        $query = Mockery::mock('\WP_Query');
-        $query->shouldReceive('is_post_type_archive')->andReturn(true);
-        $query->shouldReceive('get')->with('post_type')->andReturn('my_cpt');
+        /** @var \WP_Query|\Mockery\MockInterface $query */
+        $query = \Mockery::mock('\WP_Query');
+        $query->expects('is_post_type_archive')->andReturn(true);
+        $query->shouldReceive('get')->with('post_type')->zeroOrMoreTimes()->andReturn('my_cpt');
         Functions\expect('get_post_type_object')
             ->with('my_cpt')
-            ->andReturn((object) ['has_archive' => false]);
+            ->andReturn((object)['has_archive' => false]);
 
         $branch = new BranchPostTypeArchive();
 

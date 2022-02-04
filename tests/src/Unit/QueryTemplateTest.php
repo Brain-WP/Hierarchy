@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit;
 
-use Andrew\Proxy;
+use Brain\Hierarchy\Branch\Branch;
+use Brain\Hierarchy\Finder\FindFirstTrait;
 use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use Brain\Hierarchy\QueryTemplate;
 use Brain\Hierarchy\Tests\TestCase;
-use Brain\Hierarchy\Finder\TemplateFinderInterface;
-use Brain\Hierarchy\Loader\TemplateLoaderInterface;
-use Brain\Hierarchy\Finder\FoldersTemplateFinder;
-use Mockery;
+use Brain\Hierarchy\Finder\TemplateFinder;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
@@ -26,65 +27,80 @@ use Mockery;
  */
 class QueryTemplateTest extends TestCase
 {
-    public function testFindNoFilters()
+    /**
+     * @test
+     */
+    public function testFindNoFilters(): void
     {
         $wpQuery = new \WP_Query();
-        $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/index.php';
-        $finder = Mockery::mock(TemplateFinderInterface::class);
-        $finder->shouldReceive('findFirst')->once()->with(['index'], 'index')->andReturn($template);
+        $template = getenv('HIERARCHY_TESTS_BASEPATH') . '/files/index.php';
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->with(['index'], 'index')->andReturn($template);
 
         $loader = new QueryTemplate($finder);
 
         static::assertSame($template, $loader->findTemplate($wpQuery, false));
     }
 
-    public function testFindFilters()
+    /**
+     * @test
+     */
+    public function testFindFilters(): void
     {
         Filters\expectApplied('index_template')->once()->andReturn('foo.php');
 
-        $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/index.php';
+        $template = getenv('HIERARCHY_TESTS_BASEPATH') . '/files/index.php';
         $wpQuery = new \WP_Query();
-        $finder = Mockery::mock(TemplateFinderInterface::class);
-        $finder->shouldReceive('findFirst')->once()->with(['index'], 'index')->andReturn($template);
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->with(['index'], 'index')->andReturn($template);
 
         $loader = new QueryTemplate($finder);
 
         static::assertSame('foo.php', $loader->findTemplate($wpQuery, true));
     }
 
-    public function testLoadNoFilters()
+    /**
+     * @test
+     */
+    public function testLoadNoFilters(): void
     {
         $wpQuery = new \WP_Query();
-        $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/index.php';
-        $finder = Mockery::mock(TemplateFinderInterface::class);
-        $finder->shouldReceive('findFirst')->once()->with(['index'], 'index')->andReturn($template);
+        $template = getenv('HIERARCHY_TESTS_BASEPATH') . '/files/index.php';
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->with(['index'], 'index')->andReturn($template);
 
         $loader = new QueryTemplate($finder);
 
         static::assertSame('index', $loader->loadTemplate($wpQuery, false));
     }
 
-    public function testLoadFilters()
+    /**
+     * @test
+     */
+    public function testLoadFilters(): void
     {
         $wpQuery = new \WP_Query();
-        $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/another.php';
+        $template = getenv('HIERARCHY_TESTS_BASEPATH') . '/files/another.php';
 
         Filters\expectApplied('template_include')->once()->andReturn($template);
 
-        $finder = Mockery::mock(TemplateFinderInterface::class);
-        $finder->shouldReceive('findFirst')->once()->with(['index'], 'index')->andReturn('foo');
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->with(['index'], 'index')->andReturn('foo');
 
         $loader = new QueryTemplate($finder);
 
         static::assertSame('another', $loader->loadTemplate($wpQuery, true));
     }
 
-    public function testLoadTemplateFoundFalse()
+    /**
+     * @test
+     */
+    public function testLoadTemplateFoundFalse(): void
     {
         $wpQuery = new \WP_Query();
 
-        $finder = Mockery::mock(TemplateFinderInterface::class);
-        $finder->shouldReceive('findFirst')->once()->with(['index'], 'index')->andReturn('foo');
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->with(['index'], 'index')->andReturn('foo');
 
         $found = true;
 
@@ -95,14 +111,17 @@ class QueryTemplateTest extends TestCase
         static::assertSame('', $loaded);
     }
 
-    public function testLoadTemplateFoundTrue()
+    /**
+     * @test
+     */
+    public function testLoadTemplateFoundTrue(): void
     {
         $wpQuery = new \WP_Query();
 
-        $template = getenv('HIERARCHY_TESTS_BASEPATH').'/files/page.php';
+        $template = getenv('HIERARCHY_TESTS_BASEPATH') . '/files/page.php';
 
-        $finder = Mockery::mock(TemplateFinderInterface::class);
-        $finder->shouldReceive('findFirst')->once()->andReturn($template);
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->andReturn($template);
 
         $found = false;
 
@@ -113,115 +132,138 @@ class QueryTemplateTest extends TestCase
         static::assertSame('page', $loaded);
     }
 
-    public function testApplyFilters()
+    /**
+     * @test
+     */
+    public function testApplyFilters(): void
     {
-        $wpQuery = Mockery::mock('WP_Query');
-        $wpQuery->shouldReceive('is_main_query')->withNoArgs()->andReturn(true);
+        $mainQuery = \Mockery::mock('WP_Query');
 
         global $wp_query, $wp_the_query;
-        $wp_query = $wp_the_query = $wpQuery;
+        $wp_query = $mainQuery;
+        $wp_the_query = $mainQuery;
         $customQuery = new \WP_Query();
 
-        // during filter, globals `$wp_query` and `$wp_the_query` are equal to custom query
-        Filters\expectApplied('test_filter')
+        Filters\expectApplied('foo_template')
             ->once()
-            ->with('foo')
+            ->with('found!')
             ->andReturnUsing(
-                function () use ($customQuery) {
-                    static::assertSame($GLOBALS['wp_query'], $customQuery);
-                    static::assertSame($GLOBALS['wp_the_query'], $customQuery);
+                static function () use ($customQuery): string {
+                    // during filter, globals `$wp_query` and `$wp_the_query` are equal to custom
+                    global $wp_query, $wp_the_query;
+                    static::assertSame($wp_query, $customQuery);
+                    static::assertSame($wp_the_query, $customQuery);
 
-                    return 'bar!';
+                    return 'filtered!';
                 }
             );
 
-        $finder = \Mockery::mock(TemplateFinderInterface::class);
+        $branch = new \Brain\Hierarchy\Tests\Stubs\BranchStubFoo();
+        Filters\expectApplied('brain.hierarchy.branches')->once()->andReturn([$branch]);
 
-        $queryTemplate = new Proxy(new QueryTemplate($finder));
-        /** @noinspection PhpUndefinedMethodInspection */
-        $applied = $queryTemplate->applyFilter('test_filter', 'foo', $customQuery);
+        $finder = new class implements TemplateFinder
+        {
+            use FindFirstTrait;
+
+            public function find(string $template, string $type): string
+            {
+                return 'found!';
+            }
+        };
+
+        $queryTemplate = new QueryTemplate($finder);
+        $found = $queryTemplate->findTemplate($customQuery);
 
         // after filter, globals `$wp_query` and `$wp_the_query` are restored
+        static::assertSame($wp_query, $mainQuery);
+        static::assertSame($wp_query, $mainQuery);
 
-        static::assertSame($GLOBALS['wp_query'], $wpQuery);
-        static::assertSame($GLOBALS['wp_the_query'], $wpQuery);
-        static::assertSame('bar!', $applied);
+        static::assertSame('filtered!', $found);
 
         unset($wp_query, $wp_the_query);
     }
 
-    public function testMainQueryTemplateAllowedTrue()
+    /**
+     * @test
+     */
+    public function testMainQueryTemplateAllowedTrue(): void
     {
         Functions\when('is_robots')->justReturn(false);
         Functions\when('is_feed')->justReturn(false);
         Functions\when('is_trackback')->justReturn(false);
         Functions\when('is_embed')->justReturn(false);
+        Functions\when('is_favicon')->justReturn(false);
 
         static::assertTrue(QueryTemplate::mainQueryTemplateAllowed());
     }
 
-    public function testMainQueryTemplateAllowedFalseIsRobots()
+    /**
+     * @test
+     */
+    public function testMainQueryTemplateAllowedFalseIsRobots(): void
     {
         Functions\when('is_robots')->justReturn(true);
         Functions\when('is_feed')->justReturn(false);
         Functions\when('is_trackback')->justReturn(false);
         Functions\when('is_embed')->justReturn(false);
+        Functions\when('is_favicon')->justReturn(false);
 
         static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
-    public function testMainQueryTemplateAllowedFalseIsFeed()
+    /**
+     * @test
+     */
+    public function testMainQueryTemplateAllowedFalseIsFeed(): void
     {
         Functions\when('is_robots')->justReturn(false);
         Functions\when('is_feed')->justReturn(true);
         Functions\when('is_trackback')->justReturn(false);
         Functions\when('is_embed')->justReturn(false);
+        Functions\when('is_favicon')->justReturn(false);
 
         static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
-    public function testMainQueryTemplateAllowedFalseIsTrackback()
+    /**
+     * @test
+     */
+    public function testMainQueryTemplateAllowedFalseIsTrackback(): void
     {
         Functions\when('is_robots')->justReturn(false);
         Functions\when('is_feed')->justReturn(false);
         Functions\when('is_trackback')->justReturn(true);
         Functions\when('is_embed')->justReturn(false);
+        Functions\when('is_favicon')->justReturn(false);
 
         static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
-    public function testMainQueryTemplateAllowedFalseIsEmbed()
+    /**
+     * @test
+     */
+    public function testMainQueryTemplateAllowedFalseIsEmbed(): void
     {
         Functions\when('is_robots')->justReturn(false);
         Functions\when('is_feed')->justReturn(false);
         Functions\when('is_trackback')->justReturn(false);
         Functions\when('is_embed')->justReturn(true);
+        Functions\when('is_favicon')->justReturn(false);
 
         static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 
-    public function testInstanceWithLoader()
+    /**
+     * @test
+     */
+    public function testMainQueryTemplateAllowedFalseIsFavicon(): void
     {
-        Functions\when('get_stylesheet_directory')->justReturn();
-        Functions\when('get_template_directory')->justReturn();
+        Functions\when('is_robots')->justReturn(false);
+        Functions\when('is_feed')->justReturn(false);
+        Functions\when('is_trackback')->justReturn(false);
+        Functions\when('is_embed')->justReturn(false);
+        Functions\when('is_favicon')->justReturn(true);
 
-        $loader = Mockery::mock(TemplateLoaderInterface::class);
-        $instance = QueryTemplate::instanceWithLoader($loader);
-        $proxy = new Proxy($instance);
-
-        static::assertInstanceOf(QueryTemplate::class, $instance);
-        static::assertSame($loader, $proxy->loader);
-    }
-
-    public function instanceWithFolders()
-    {
-        $folders = [__DIR__];
-        $loader = Mockery::mock(TemplateLoaderInterface::class);
-        $instance = QueryTemplate::instanceWithFolders($folders, $loader);
-        $proxy = new Proxy($instance);
-
-        static::assertInstanceOf(QueryTemplate::class, $instance);
-        static::assertInstanceOf(FoldersTemplateFinder::class, $proxy->finder);
-        static::assertSame($loader, $proxy->loader);
+        static::assertFalse(QueryTemplate::mainQueryTemplateAllowed());
     }
 }

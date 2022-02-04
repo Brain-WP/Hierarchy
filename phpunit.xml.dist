@@ -1,11 +1,8 @@
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/5.7/phpunit.xsd"
-         bootstrap="./tests/boot.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         stopOnFailure="false">
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/7.5/phpunit.xsd"
+    bootstrap="./tests/boot.php"
+    colors="true">
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
@@ -20,10 +17,10 @@
         <log type="coverage-clover" target="./build/logs/coverage.xml"/>
     </logging>
     <testsuites>
-        <testsuite name="U">
+        <testsuite name="unit">
             <directory>./tests/src/Unit</directory>
         </testsuite>
-        <testsuite name="F">
+        <testsuite name="functional">
             <directory>./tests/src/Functional</directory>
         </testsuite>
     </testsuites>

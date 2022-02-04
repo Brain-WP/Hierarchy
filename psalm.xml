@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<psalm
+    totallyTyped="true"
+    useDocblockPropertyTypes="true"
+    usePhpDocMethodsWithoutMagicCall="true"
+    strictBinaryOperands="true"
+    ignoreInternalFunctionFalseReturn="false"
+    ignoreInternalFunctionNullReturn="false"
+    hideExternalErrors="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src"/>
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <stubs>
+        <file name="vendor/php-stubs/wordpress-stubs/wordpress-stubs.php" />
+    </stubs>
+
+    <issueHandlers>
+        <MixedAssignment errorLevel="suppress" />
+        <ParadoxicalCondition errorLevel="suppress" />
+        <RedundantCondition errorLevel="suppress" />
+        <UnresolvableInclude errorLevel="suppress" />
+        <UndefinedConstant errorLevel="suppress" />
+        <RedundantCastGivenDocblockType errorLevel="suppress" />
+        <DocblockTypeContradiction errorLevel="suppress" />
+    </issueHandlers>
+</psalm>

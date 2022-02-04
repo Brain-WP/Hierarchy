@@ -1,24 +1,37 @@
 <?php
 /*
- * This file is part of the Foil package.
- *
- * (c) Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
+ * This file is part of the "Hierarchy" package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-$vendor = dirname(dirname(__FILE__)).'/vendor/';
+declare(strict_types=1);
 
-if (!realpath($vendor)) {
+$testsDir = str_replace('\\', '/', __DIR__);
+$libDir = dirname($testsDir);
+$vendorDir = "{$libDir}/vendor";
+$autoload = "{$vendorDir}/autoload.php";
+
+if (!is_file($autoload)) {
     die('Please install via Composer before running tests.');
 }
 
-require_once $vendor.'antecedent/patchwork/Patchwork.php';
-require_once $vendor.'autoload.php';
-unset($vendor);
+putenv('HIERARCHY_TESTS_BASEPATH=' . $testsDir);
+putenv('HIERARCHY_LIBRARY_PATH=' . $libDir);
+putenv('HIERARCHY_VENDOR_DIR=' . $vendorDir);
+
+error_reporting(E_ALL);
+
+require_once "{$vendorDir}/antecedent/patchwork/Patchwork.php";
+require_once $autoload;
+
+if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
+    define('PHPUNIT_COMPOSER_INSTALL', $autoload);
+    require_once $autoload;
+}
 
 require_once __DIR__.'/stubs/wp.php';
 require_once __DIR__.'/stubs/branches.php';
 
-putenv('HIERARCHY_TESTS_BASEPATH='.__DIR__);
+unset($libDir, $testsDir, $vendorDir, $autoload);

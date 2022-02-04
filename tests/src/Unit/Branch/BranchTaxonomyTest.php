@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
@@ -17,9 +20,12 @@ use Brain\Hierarchy\Tests\TestCase;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchTaxonomyTest extends TestCase
+class BranchTaxonomyTest extends TestCase
 {
-    public function testLeavesNoTax()
+    /**
+     * @test
+     */
+    public function testLeavesNoTax(): void
     {
         $query = new \WP_Query([]);
         $branch = new BranchTaxonomy();
@@ -27,9 +33,12 @@ final class BranchTaxonomyTest extends TestCase
         static::assertSame(['taxonomy'], $branch->leaves($query));
     }
 
-    public function testLeaves()
+    /**
+     * @test
+     */
+    public function testLeaves(): void
     {
-        $taxonomy = (object) ['slug' => 'foo', 'taxonomy' => 'custom-tax'];
+        $taxonomy = (object)['slug' => 'foo', 'taxonomy' => 'custom-tax'];
         $query = new \WP_Query([], $taxonomy);
 
         $branch = new BranchTaxonomy();

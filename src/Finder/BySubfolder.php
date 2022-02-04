@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Brain\Hierarchy\Finder;
 
@@ -18,39 +21,43 @@ namespace Brain\Hierarchy\Finder;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class SubfolderTemplateFinder implements TemplateFinderInterface
+final class BySubfolder implements TemplateFinder
 {
     /**
-     * @var \Brain\Hierarchy\Finder\FoldersTemplateFinder
+     * @var ByFolders
      */
     private $finder;
 
     /**
-     * @param string       $subfolder
-     * @param string|array $extension
+     * @param string $subfolder
+     * @param string $extension
+     * @param string ...$extensions
      */
-    public function __construct($subfolder, $extension = 'php')
+    public function __construct(string $subfolder, string $extension = 'php', string ...$extensions)
     {
-        $stylesheet = trailingslashit(get_stylesheet_directory()).$subfolder;
-        $template = trailingslashit(get_template_directory()).$subfolder;
+        $stylesheet = trailingslashit(get_stylesheet_directory()) . $subfolder;
+        $template = trailingslashit(get_template_directory()) . $subfolder;
         $folders = [$stylesheet];
         ($stylesheet !== $template) and $folders[] = $template;
-
-        $this->finder = new FoldersTemplateFinder($folders, $extension);
+        $this->finder = new ByFolders($folders, $extension, ...$extensions);
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $template
+     * @param string $type
+     * @return string
      */
-    public function find($template, $type)
+    public function find(string $template, string $type): string
     {
         return $this->finder->find($template, $type);
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $templates
+     * @param string $type
+     * @return string
      */
-    public function findFirst(array $templates, $type)
+    public function findFirst(array $templates, string $type): string
     {
         return $this->finder->findFirst($templates, $type);
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,43 +9,47 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Branch;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchAttachment implements BranchInterface
+final class BranchAttachment implements Branch
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'attachment';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return $query->is_attachment();
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         /** @var \WP_Post $post */
         $post = $query->get_queried_object();
-        $post instanceof \WP_Post or $post = new \WP_Post((object) ['ID' => 0]);
+        ($post instanceof \WP_Post) or $post = new \WP_Post((object)['ID' => 0]);
 
         $leaves = [];
-        empty($post->post_mime_type) or $mimetype = explode('/', $post->post_mime_type, 2);
-        if (!empty($mimetype) && !empty($mimetype[0])) {
-            $leaves = isset($mimetype[1]) && $mimetype[1]
+        $mimetype = $post->post_mime_type ? explode('/', $post->post_mime_type, 2) : null;
+        if ($mimetype && !empty($mimetype[0])) {
+            $leaves = !empty($mimetype[1])
                 ? [$mimetype[0], $mimetype[1], "{$mimetype[0]}_{$mimetype[1]}"]
                 : [$mimetype[0]];
         }

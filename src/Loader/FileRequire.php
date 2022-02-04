@@ -11,37 +11,27 @@
 
 declare(strict_types=1);
 
-namespace Brain\Hierarchy\Branch;
+namespace Brain\Hierarchy\Loader;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class Branch404 implements Branch
+final class FileRequire implements Loader
 {
     /**
+     * @param string $templatePath
      * @return string
      */
-    public function name(): string
+    public function load(string $templatePath): string
     {
-        return '404';
-    }
+        if ((!defined('WP_DEBUG') || !WP_DEBUG) && !file_exists($templatePath)) {
+            return '';
+        }
 
-    /**
-     * @param \WP_Query $query
-     * @return bool
-     */
-    public function is(\WP_Query $query): bool
-    {
-        return $query->is_404();
-    }
+        ob_start();
+        require $templatePath;
 
-    /**
-     * @param \WP_Query $query
-     * @return list<string>
-     */
-    public function leaves(\WP_Query $query): array
-    {
-        return ['404'];
+        return trim(ob_get_clean() ?: '');
     }
 }

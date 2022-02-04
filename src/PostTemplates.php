@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy;
 
 /**
@@ -16,9 +19,8 @@ namespace Brain\Hierarchy;
  */
 class PostTemplates
 {
-
     /**
-     * @var array[]
+     * @var array<string, list<string>>
      */
     private $templates = [];
 
@@ -26,13 +28,13 @@ class PostTemplates
      * @param \WP_Post $post
      * @return string
      */
-    public function findFor(\WP_Post $post)
+    public function findFor(\WP_Post $post): string
     {
         if (!$post->ID || !$post->post_type) {
             return '';
         }
 
-        $stored = filter_var(get_page_template_slug($post), FILTER_SANITIZE_URL);
+        $stored = get_page_template_slug($post);
         if (!$stored || validate_file($stored) !== 0) {
             return '';
         }
@@ -54,20 +56,19 @@ class PostTemplates
 
     /**
      * @param string $postType
-     * @return string[]
+     * @return list<string>
      */
-    private function templatesForType($postType)
+    private function templatesForType(string $postType): array
     {
         if (array_key_exists($postType, $this->templates)) {
             return $this->templates[$postType];
         }
 
         $this->templates[$postType] = [];
-        $templates = (array)wp_get_theme()->get_page_templates(null, $postType);
-        foreach ($templates as $template => $header) {
+        $templates = array_keys((array)wp_get_theme()->get_page_templates(null, $postType));
+        foreach ($templates as $template) {
             if ($template && is_string($template)) {
-                $sanitized = filter_var($template, FILTER_SANITIZE_URL);
-                $this->templates[$postType][] = wp_normalize_path($sanitized);
+                $this->templates[$postType][] = wp_normalize_path(sanitize_file_name($template));
             }
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,22 +9,26 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
 use Brain\Hierarchy\Branch\BranchSingle;
 use Brain\Hierarchy\PostTemplates;
 use Brain\Hierarchy\Tests\TestCase;
-use Mockery;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchSingleTest extends TestCase
+class BranchSingleTest extends TestCase
 {
-    public function testLeavesNoPost()
+    /**
+     * @test
+     */
+    public function testLeavesNoPost(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 0;
         $post->post_name = '';
         $post->post_type = '';
@@ -34,18 +39,20 @@ final class BranchSingleTest extends TestCase
         static::assertSame(['single'], $branch->leaves($query));
     }
 
-    public function testLeavesNoTemplate()
+    /**
+     * @test
+     */
+    public function testLeavesNoTemplate(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 123;
         $post->post_name = 'one_two_three';
         $post->post_type = 'my_cpt';
         $query = new \WP_Query([], $post);
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('');
 
@@ -54,24 +61,26 @@ final class BranchSingleTest extends TestCase
         $expected = [
             'single-my_cpt-one_two_three',
             'single-my_cpt',
-            'single'
+            'single',
         ];
 
         static::assertSame($expected, $branch->leaves($query));
     }
 
-    public function testLeavesPostTemplate()
+    /**
+     * @test
+     */
+    public function testLeavesPostTemplate(): void
     {
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->ID = 123;
         $post->post_name = 'one_two_three';
         $post->post_type = 'my_cpt';
         $query = new \WP_Query([], $post);
 
-        $postTemplates = Mockery::mock(PostTemplates::class);
+        $postTemplates = \Mockery::mock(PostTemplates::class);
         $postTemplates
-            ->shouldReceive('findFor')
-            ->once()
+            ->expects('findFor')
             ->with($post)
             ->andReturn('templates/foo');
 
@@ -81,7 +90,7 @@ final class BranchSingleTest extends TestCase
             'templates/foo',
             'single-my_cpt-one_two_three',
             'single-my_cpt',
-            'single'
+            'single',
         ];
 
         static::assertSame($expected, $branch->leaves($query));

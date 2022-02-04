@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -14,24 +15,22 @@ namespace Brain\Hierarchy\Branch;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-interface BranchInterface
+interface Branch
 {
     /**
      * @return string
      */
-    public function name();
+    public function name(): string;
 
     /**
      * @param \WP_Query $query
-     *
      * @return bool
      */
-    public function is(\WP_Query $query);
+    public function is(\WP_Query $query): bool;
 
     /**
      * @param \WP_Query $query
-     *
-     * @return array
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query);
+    public function leaves(\WP_Query $query): array;
 }

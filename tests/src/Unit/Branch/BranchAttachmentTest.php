@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,36 +9,46 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Tests\Unit\Branch;
 
 use Brain\Hierarchy\Branch\BranchAttachment;
 use Brain\Hierarchy\Tests\TestCase;
-use Mockery;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchAttachmentTest extends TestCase
+class BranchAttachmentTest extends TestCase
 {
-    public function testLeavesNoPost()
+    /**
+     * @test
+     */
+    public function testLeavesNoPost(): void
     {
         $branch = new BranchAttachment();
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->post_mime_type = '';
         $wpQuery = new \WP_Query(['is_attachment'], $post);
 
         static::assertSame(['attachment'], $branch->leaves($wpQuery));
     }
 
-    public function testLeaves()
+    /**
+     * @test
+     */
+    public function testLeaves(): void
     {
         $branch = new BranchAttachment();
-        $post = Mockery::mock('\WP_Post');
+        $post = \Mockery::mock('\WP_Post');
         $post->post_mime_type = 'image/jpeg';
         $wpQuery = new \WP_Query(['is_attachment'], $post);
         $wpQuery->post = $post;
 
-        static::assertSame(['image', 'jpeg', 'image_jpeg', 'attachment'], $branch->leaves($wpQuery));
+        static::assertSame(
+            ['image', 'jpeg', 'image_jpeg', 'attachment'],
+            $branch->leaves($wpQuery)
+        );
     }
 }

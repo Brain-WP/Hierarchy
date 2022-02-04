@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -8,34 +9,37 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Brain\Hierarchy\Branch;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchArchive implements BranchInterface
+final class BranchArchive implements Branch
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function name()
+    public function name(): string
     {
         return 'archive';
     }
 
     /**
-     * {@inheritdoc}
+     * @param \WP_Query $query
+     * @return bool
      */
-    public function is(\WP_Query $query)
+    public function is(\WP_Query $query): bool
     {
         return $query->is_archive();
     }
 
     /**
-     * {@inheritdoc}
+     * @return list<string>
      */
-    public function leaves(\WP_Query $query)
+    public function leaves(\WP_Query $query): array
     {
         return ['archive'];
     }

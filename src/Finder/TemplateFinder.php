@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -14,7 +15,7 @@ namespace Brain\Hierarchy\Finder;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-interface TemplateFinderInterface
+interface TemplateFinder
 {
     /**
      * Receives
@@ -27,21 +28,19 @@ interface TemplateFinderInterface
      *
      * @param string $template
      * @param string $type
-     *
      * @return string
      *
      * @link https://developer.wordpress.org/reference/hooks/type_template/
      */
-    public function find($template, $type);
+    public function find(string $template, string $type): string;
 
     /**
      * Similar to find(), but first argument is an array fo templates.
      * Has to return full absolute template path of the first template found, or "" if not found.
      *
-     * @param array  $templates
+     * @param array<string> $templates
      * @param string $type
-     *
      * @return string
      */
-    public function findFirst(array $templates, $type);
+    public function findFirst(array $templates, string $type): string;
 }

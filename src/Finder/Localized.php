@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the Hierarchy package.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace Brain\Hierarchy\Finder;
 
@@ -30,9 +33,9 @@ namespace Brain\Hierarchy\Finder;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class LocalizedTemplateFinder implements TemplateFinderInterface
+final class Localized implements TemplateFinder
 {
-    use FindFirstTemplateTrait;
+    use FindFirstTrait;
 
     /**
      * @var array
@@ -40,41 +43,39 @@ final class LocalizedTemplateFinder implements TemplateFinderInterface
     private $folders = [];
 
     /**
-     * @var \Brain\Hierarchy\Finder\FoldersTemplateFinder
+     * @var TemplateFinder
      */
     private $finder;
 
     /**
-     * @param \Brain\Hierarchy\Finder\TemplateFinderInterface $finder
+     * @param TemplateFinder|null $finder
      */
-    public function __construct(TemplateFinderInterface $finder = null)
+    public function __construct(?TemplateFinder $finder = null)
     {
-        $this->finder = $finder ?: new FoldersTemplateFinder();
+        $this->finder = $finder ?: new ByFolders();
         $locale = get_locale();
         if (!$locale || !is_string($locale)) {
             return;
         }
-        $this->folders = [filter_var($locale, FILTER_SANITIZE_URL)];
+        $sanitized = sanitize_file_name($locale);
+        $this->folders = [$sanitized];
         if (strpos($locale, '_') !== false) {
-            $parts = explode('_', $locale, 2);
-            $part = reset($parts);
-            $part and $this->folders[] = filter_var($part, FILTER_SANITIZE_URL);
+            $part = explode('_', $locale, 2)[0];
+            $part and $this->folders[] = $part;
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $template
+     * @param string $type
+     * @return string
      */
-    public function find($template, $type)
+    public function find(string $template, string $type): string
     {
-        if (empty($this->folders)) {
-            return $this->finder->find($template, $type);
+        $templates = [];
+        foreach ($this->folders as $folder) {
+            $templates[] = "{$folder}/{$template}";
         }
-
-        $templates = array_map(function ($folder) use ($template) {
-            return $folder.'/'.$template;
-        }, $this->folders);
-
         $templates[] = $template;
 
         return $this->finder->findFirst($templates, $type);
