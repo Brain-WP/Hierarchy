@@ -76,7 +76,7 @@ jobs:
                     dependency-versions: ${{ matrix.dependency-versions }}
                     composer-options: ${{ matrix.composer-options }}
 
-            -   name: Install parallel-lint
+            -   name: Lint PHP sources
                 if: ${{ matrix.dependency-versions == 'highest' }}
                 run: ./vendor/bin/parallel-lint ./src/ --checkstyle | cs2pr
 
