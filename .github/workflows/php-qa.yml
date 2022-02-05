@@ -70,6 +70,9 @@ jobs:
                 if: ${{ matrix.dependency-versions == 'highest' }}
                 run: parallel-lint ./src/ --checkstyle | cs2pr
 
+            -   name: Remove Psalm to avoid conflicts with PHP version
+                run: composer remove vimeo/psalm --no-update
+
             -   name: Install dependencies
                 uses: ramsey/composer-install@v2
                 with:
