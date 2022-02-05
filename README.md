@@ -541,13 +541,12 @@ templates according to WordPress template hierarchy.
 namespace My\Theme;
 
 use Brain\Hierarchy\{Finder, Loader, QueryTemplate};
-use Mustache_Engine;
 
 class MustacheTemplateLoader implements Loader\Loader
 {
    private $engine;
 
-   public function __construct(Mustache_Engine $engine)
+   public function __construct(\Mustache_Engine $engine)
    {
       $this->engine = $engine;
    }
@@ -561,30 +560,23 @@ class MustacheTemplateLoader implements Loader\Loader
    }
 }
 
-add_action('template_redirect', function()d {
-
+add_action('template_redirect', function() {
     if (!QueryTemplate::mainQueryTemplateAllowed()) {
         return;
     }
 
-    // will look for "*.mustache" templates in "/templates" subfolder of theme
-    $finder = new Finder\BySubfolder('templates', 'mustache');
-
-    // make use of the class above
-    $loader = new MustacheTemplateLoader(new Mustache_Engine());
-
-    $queryTemplate = new QueryTemplate($finder, $loader);
+    $queryTemplate = new QueryTemplate(
+        // will look for "*.mustache" templates in theme's "/templates" subfolder
+        new Finder\BySubfolder('templates', 'mustache'),
+        // the loader class defined above
+        new MustacheTemplateLoader(new \Mustache_Engine())
+    );
 
     // 3rd argument of loadTemplate() is passed by reference, and set to true if template is found
-    $found = false;
-
-    // load the rendered template
-    $content = $queryTemplate->loadTemplate($GLOBALS['wp_query'], true, $found);
-
+    $content = $queryTemplate->loadTemplate(null, true, $found);
     // if template was found, let's output it and exit, otherwise WordPress will continue its work
     if ($found) {
-        echo $content;
-        exit();
+        die($content);
     }
 });
 ```
