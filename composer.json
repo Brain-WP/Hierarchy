@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "brain/monkey": "^2.6.1",
-        "mockery/mockery": "^1.5.0",
+        "mockery/mockery": "^1.3.0 || ^1.5.0",
         "symfony/finder": "^v4.4.37",
         "phpunit/phpunit": "^7.5.20 || ^9.5.13",
         "inpsyde/php-coding-standards": "^1@dev",
