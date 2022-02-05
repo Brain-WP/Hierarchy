@@ -39,7 +39,7 @@ jobs:
         env:
             USE_COVERAGE: 'no'
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
                 php-ver: [ '7.1', '7.2', '7.3', '7.4', '8.0', '8.1' ]
                 dependency-versions: [ 'lowest', 'highest' ]
@@ -64,7 +64,7 @@ jobs:
                     php-version: ${{ matrix.php-ver }}
                     ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
                     coverage: ${{ ((env.USE_COVERAGE == 'yes') && 'xdebug') || 'none' }}
-                    tools: cs2pr, parallel-lint:^1.3.1
+                    tools: cs2pr, parallel-lint
 
             -   name: Check syntax error in sources
                 if: ${{ matrix.dependency-versions == 'highest' }}
