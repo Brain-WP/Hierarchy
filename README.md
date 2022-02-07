@@ -1,6 +1,6 @@
 # Hierarchy
 
-[![travis-ci status](https://img.shields.io/travis/Brain-WP/Hierarchy.svg?style=flat-square)](https://travis-ci.org/Brain-WP/Hierarchy)
+[![PHP Quality Assurance](https://github.com/Brain-WP/Hierarchy/actions/workflows/php-qa.yml/badge.svg?branch=master)](https://github.com/Brain-WP/Hierarchy/actions/workflows/php-qa.yml)
 [![codecov.io](https://img.shields.io/codecov/c/github/Brain-WP/Hierarchy.svg?style=flat-square)](http://codecov.io/github/Brain-WP/Hierarchy?branch=master)
 [![license](https://img.shields.io/packagist/l/brain/hierarchy.svg?style=flat-square)](http://opensource.org/licenses/MIT)
 [![release](https://img.shields.io/github/release/Brain-WP/Hierarchy.svg?style=flat-square)](https://github.com/Brain-WP/Hierarchy/releases/latest)
