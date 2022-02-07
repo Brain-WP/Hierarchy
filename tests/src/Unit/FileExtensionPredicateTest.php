@@ -95,6 +95,7 @@ class FileExtensionPredicateTest extends TestCase
     {
         return [
             ['php', ['php']],
+            ['.html.php', ['html.php']],
             ["\0\n\t .PhP \0\n\t", ['php']],
             ['twig|php|html', ['twig', 'php', 'html']],
             ["\nTWIG | php\t | .Html", ['twig', 'php', 'html']],

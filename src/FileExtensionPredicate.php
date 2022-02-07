@@ -22,7 +22,7 @@ class FileExtensionPredicate
     /**
      * @var string[]
      */
-    private $extension = [];
+    private $extensions = [];
 
     /**
      * @param string ...$rawExtensions
@@ -34,7 +34,7 @@ class FileExtensionPredicate
         foreach ($rawExtensions as $rawExtension) {
             $extensions = explode('|', strtolower(trim($rawExtension)));
             foreach ($extensions as $extension) {
-                $parsed[] = $extension ? ltrim(trim($extension), '.') : '';
+                $parsed[] = ltrim(trim($extension), '.');
             }
         }
 
@@ -46,7 +46,7 @@ class FileExtensionPredicate
      */
     public function __construct(string ...$extension)
     {
-        $this->extension = self::parseExtensions(...$extension);
+        $this->extensions = self::parseExtensions(...$extension);
     }
 
     /**
@@ -55,8 +55,18 @@ class FileExtensionPredicate
      */
     public function __invoke(string $templatePath): bool
     {
-        $ext = strtolower(pathinfo($templatePath, PATHINFO_EXTENSION));
+        $parts = explode('.', $templatePath);
+        // support for "composed" extension like `.html.php`
+        $target = (count($parts) > 2)
+            ? strtolower(implode('.', array_slice($parts, -2, 2)))
+            : strtolower(array_pop($parts));
 
-        return in_array($ext, $this->extension, true);
+        foreach ($this->extensions as $extension) {
+            if ($target === $extension) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

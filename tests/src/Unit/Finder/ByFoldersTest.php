@@ -50,6 +50,19 @@ class ByFoldersTest extends TestCase
     /**
      * @test
      */
+    public function testFindComposedExtension(): void
+    {
+        $template = getenv('HIERARCHY_TESTS_BASEPATH') . '/files/composed.html.php';
+
+        $folders = [getenv('HIERARCHY_TESTS_BASEPATH') . '/files'];
+        $finder = new ByFolders($folders, 'html.php');
+
+        static::assertSame($template, $finder->find('composed', 'index'));
+    }
+
+    /**
+     * @test
+     */
     public function testFindFirst(): void
     {
         $folders = [getenv('HIERARCHY_TESTS_BASEPATH') . '/files'];
