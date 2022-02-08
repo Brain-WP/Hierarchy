@@ -56,13 +56,17 @@ class FileExtensionPredicate
     public function __invoke(string $templatePath): bool
     {
         $parts = explode('.', $templatePath);
-        // support for "composed" extension like `.html.php`
-        $target = (count($parts) > 2)
-            ? strtolower(implode('.', array_slice($parts, -2, 2)))
-            : strtolower(array_pop($parts));
+        $isComposed = count($parts) > 2;
+
+        $targets = [strtolower(array_pop($parts))];
+        if ($isComposed) {
+            // support for "composed" extension like `.html.php`
+            /** @psalm-suppress PossiblyNullOperand */
+            array_unshift($targets, strtolower("{$targets[0]}." . array_pop($parts)));
+        }
 
         foreach ($this->extensions as $extension) {
-            if ($target === $extension) {
+            if (in_array($extension, $targets, true)) {
                 return true;
             }
         }
