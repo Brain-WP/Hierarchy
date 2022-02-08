@@ -30,6 +30,7 @@ class Hierarchy
         'search' => Branch\BranchSearch::class,
         'frontpage' => Branch\BranchFrontPage::class,
         'home' => Branch\BranchHome::class,
+        'privacy_policy' => Branch\BranchPrivacyPolicy::class,
         'post-type-archive' => Branch\BranchPostTypeArchive::class,
         'taxonomy' => Branch\BranchTaxonomy::class,
         'attachment' => Branch\BranchAttachment::class,
@@ -41,7 +42,6 @@ class Hierarchy
         'author' => Branch\BranchAuthor::class,
         'date' => Branch\BranchDate::class,
         'archive' => Branch\BranchArchive::class,
-        'paged' => Branch\BranchPaged::class,
     ];
 
     /**

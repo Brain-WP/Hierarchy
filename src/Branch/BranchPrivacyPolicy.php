@@ -17,14 +17,14 @@ namespace Brain\Hierarchy\Branch;
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
  * @license http://opensource.org/licenses/MIT MIT
  */
-final class BranchPaged implements Branch
+final class BranchPrivacyPolicy implements Branch
 {
     /**
      * @return string
      */
     public function name(): string
     {
-        return 'paged';
+        return 'privacy_policy';
     }
 
     /**
@@ -33,7 +33,7 @@ final class BranchPaged implements Branch
      */
     public function is(\WP_Query $query): bool
     {
-        return $query->is_paged();
+        return $query->is_privacy_policy();
     }
 
     /**
@@ -42,6 +42,6 @@ final class BranchPaged implements Branch
      */
     public function leaves(\WP_Query $query): array
     {
-        return ['paged'];
+        return ['privacy-policy'];
     }
 }
