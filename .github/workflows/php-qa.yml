@@ -27,7 +27,7 @@ jobs:
 
             -   name: Check code styles
                 run: |
-                    ./vendor/bin/phpcs -q --report-full --report-checkstyle="phpcs-report.xml"  --runtime-set testVersion 7.2- --runtime-set ignore_errors_on_exit 1 --runtime-set ignore_warnings_on_exit 1
+                    ./vendor/bin/phpcs -q --report-full --report-checkstyle="phpcs-report.xml" --runtime-set testVersion 7.2- --runtime-set ignore_errors_on_exit 1
                     cs2pr --graceful-warnings phpcs-report.xml
 
             -   name: Check Psalm
@@ -82,7 +82,7 @@ jobs:
 
             -   name: Check if PHPUnit 9 is installed
                 id: phpunit_ver
-                run: echo ::set-output name=is_phpunit_9::$(composer show phpunit/phpunit | grep "* 9\.5\." -c)
+                run: echo ::set-output name=is_phpunit_9::$(composer show phpunit/phpunit | grep -E -c 'versions.+9')
 
             -   name: Migrate PHPUnit configuration (PHPUnit 9)
                 if: ${{ steps.phpunit_ver.outputs.is_phpunit_9 != 0 }}
@@ -92,7 +92,7 @@ jobs:
                 run: ./vendor/bin/phpunit --testsuite=unit ${{ ((env.USE_COVERAGE == 'yes') && '--coverage-clover=coverage.xml') || '--no-coverage' }}
 
             -   name: Update codecov.io
-                uses: codecov/codecov-action@v1
-                if: ${{ env.USE_COVERAGE == 'yes' }}
+                uses: codecov/codecov-action@v2
+                if: ${{ (env.USE_COVERAGE == 'yes') && (github.ref == 'refs/heads/master') }}
                 with:
                     file: ./coverage.xml
