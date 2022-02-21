@@ -186,6 +186,24 @@ class QueryTemplateTest extends TestCase
     /**
      * @test
      */
+    public function testFindTemplateWhen404(): void
+    {
+        $wpQuery = new \WP_Query([
+            'is_404' => true,
+        ]);
+
+        $finder = \Mockery::mock(TemplateFinder::class);
+        $finder->expects('findFirst')->andReturn('foo');
+
+        $loader = new QueryTemplate($finder);
+        $loaded = $loader->findTemplate($wpQuery);
+
+        static::assertSame('foo', $loaded);
+    }
+
+    /**
+     * @test
+     */
     public function testMainQueryTemplateAllowedTrue(): void
     {
         Functions\when('is_robots')->justReturn(false);
