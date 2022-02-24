@@ -84,7 +84,7 @@ class QueryTemplate
         $found = '';
         while ($types && !$found) {
             $type = array_shift($types);
-            $found = $this->finder->findFirst($leaves[$type], (string) $type);
+            $found = $this->finder->findFirst($leaves[$type], (string)$type);
             $filters and $found = $this->applyFilter("{$type}_template", $found, $query);
         }
 

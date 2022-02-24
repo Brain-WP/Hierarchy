@@ -26,9 +26,7 @@ jobs:
                 uses: ramsey/composer-install@v2
 
             -   name: Check code styles
-                run: |
-                    ./vendor/bin/phpcs -q --report-full --report-checkstyle="phpcs-report.xml" --runtime-set testVersion 7.2- --runtime-set ignore_errors_on_exit 1
-                    cs2pr --graceful-warnings phpcs-report.xml
+                run: ./vendor/bin/phpcs -q --report=checkstyle | cs2pr
 
             -   name: Check Psalm
                 run: ./vendor/bin/psalm --output-format=github --no-cache
