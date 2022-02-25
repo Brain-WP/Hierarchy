@@ -80,10 +80,10 @@ jobs:
 
             -   name: Check if PHPUnit 9 is installed
                 id: phpunit_ver
-                run: echo ::set-output name=is_phpunit_9::$(./vendor/bin/phpunit --version | grep -c '9\.')
+                run: echo ::set-output name=is_phpunit_9::$(./vendor/bin/phpunit --atleast-version "9"; echo "$?")
 
             -   name: Migrate PHPUnit configuration (PHPUnit 9)
-                if: ${{ steps.phpunit_ver.outputs.is_phpunit_9 != 0 }}
+                if: ${{ steps.phpunit_ver.outputs.is_phpunit_9 == 0 }}
                 run: ./vendor/bin/phpunit --migrate-configuration
 
             -   name: Run unit tests
