@@ -17,6 +17,7 @@ use Brain\Hierarchy\Finder\ByFolders;
 use Brain\Hierarchy\Finder\TemplateFinder;
 use Brain\Hierarchy\Loader\FileRequire;
 use Brain\Hierarchy\Loader\Loader;
+use WP_Query;
 
 /**
  * @author  Giuseppe Mazzapica <giuseppe.mazzapica@gmail.com>
@@ -73,7 +74,7 @@ class QueryTemplate
      * @param bool $filters
      * @return string
      */
-    public function findTemplate(?\WP_Query $query = null, bool $filters = true): string
+    public function findTemplate(?WP_Query $query = null, bool $filters = true): string
     {
         $leaves = (new Hierarchy())->hierarchy($query);
         if (!$leaves) {
@@ -102,7 +103,7 @@ class QueryTemplate
      * @return string
      */
     public function loadTemplate(
-        ?\WP_Query $query = null,
+        ?WP_Query $query = null,
         bool $filters = true,
         bool &$found = false
     ): string {
@@ -118,37 +119,40 @@ class QueryTemplate
      * To maximize compatibility, when applying a filters and the WP_Query object we are using is
      * NOT the main query, we temporarily set global $wp_query + $wp_the_query to the custom query.
      *
-     * @param string $filter
+     * @param string $hookName
      * @param string $value
      * @param \WP_Query|null $query
      * @return string
      */
-    protected function applyFilter(string $filter, string $value, ?\WP_Query $query = null): string
+    protected function applyFilter(string $hookName, string $value, ?WP_Query $query = null): string
     {
-        /** @var array{\WP_Query, \WP_Query}|null $backup */
-        $backup = null;
         global $wp_query, $wp_the_query;
-        /**
-         * @var \WP_Query $wp_query
-         * @var \WP_Query $wp_the_query
-         */
-        is_null($query) and $query = $wp_query;
-        $custom = !$query->is_main_query();
 
-        if ($custom && ($wp_query instanceof \WP_Query) && ($wp_the_query instanceof \WP_Query)) {
-            $backup = [$wp_query, $wp_the_query];
-            $wp_query = $query;
-            $wp_the_query = $query;
+        if (is_null($query)) {
+            $query = $wp_query;
         }
 
-        $filtered = apply_filters($filter, $value);
-        is_string($filtered) and $value = $filtered;
+        // Handle main query.
+        if ($query->is_main_query()) {
+            $filteredValue = apply_filters($hookName, $value);
 
-        if ($custom && $backup) {
-            [$wpQuery, $wpTheQuery] = $backup;
-            $wp_query = $wpQuery;
-            $wp_the_query = $wpTheQuery;
+            return is_string($filteredValue) ? $filteredValue : $value;
         }
+
+        // Handle custom queries.
+        $customQueryBackup = $wp_query;
+        $customTheQueryBackup = $wp_the_query;
+        // Overwrite main query globals.
+        $wp_query = $query;
+        $wp_the_query = $query;
+
+        $filteredValue = apply_filters($hookName, $value);
+        if (is_string($filteredValue)) {
+            $value = $filteredValue;
+        }
+
+        $wp_query = $customQueryBackup;
+        $wp_the_query = $customTheQueryBackup;
 
         return $value;
     }
