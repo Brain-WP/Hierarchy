@@ -140,21 +140,19 @@ class QueryTemplate
         }
 
         // Handle custom queries.
-        if ($wp_query instanceof WP_Query && $wp_the_query instanceof WP_Query) {
-            $customQueryBackup = $wp_query;
-            $customTheQueryBackup = $wp_the_query;
-            // Overwrite main query globals.
-            $wp_query = $query;
-            $wp_the_query = $query;
+        $customQueryBackup = $wp_query;
+        $customTheQueryBackup = $wp_the_query;
+        // Overwrite main query globals.
+        $wp_query = $query;
+        $wp_the_query = $query;
 
-            $filteredValue = apply_filters($hookName, $value);
-            if (is_string($filteredValue)) {
-                $value = $filteredValue;
-            }
-
-            $wp_query = $customQueryBackup;
-            $wp_the_query = $customTheQueryBackup;
+        $filteredValue = apply_filters($hookName, $value);
+        if (is_string($filteredValue)) {
+            $value = $filteredValue;
         }
+
+        $wp_query = $customQueryBackup;
+        $wp_the_query = $customTheQueryBackup;
 
         return $value;
     }
