@@ -84,8 +84,10 @@ class QueryTemplate
         $found = '';
         while ($types && !$found) {
             $type = array_shift($types);
-            $found = $this->finder->findFirst($leaves[$type], (string)$type);
-            $filters and $found = $this->applyFilter("{$type}_template", $found, $query);
+            $templates = $leaves[$type];
+            $found = $this->finder->findFirst($templates, (string) $type);
+            $filterArgs = [$found, $type, $templates];
+            $filters and $found = $this->applyFilter("{$type}_template", $filterArgs, $query);
         }
 
         return $found;
@@ -108,7 +110,7 @@ class QueryTemplate
     ): string {
 
         $template = $this->findTemplate($query, $filters);
-        $filters and $template = $this->applyFilter('template_include', $template, $query);
+        $filters and $template = $this->applyFilter('template_include', [$template], $query);
         $found = is_file($template) && is_readable($template);
 
         return $found ? $this->loader->load($template) : '';
@@ -119,11 +121,11 @@ class QueryTemplate
      * NOT the main query, we temporarily set global $wp_query + $wp_the_query to the custom query.
      *
      * @param string $filter
-     * @param string $value
+     * @param array $filterArgs
      * @param \WP_Query|null $query
      * @return string
      */
-    protected function applyFilter(string $filter, string $value, ?\WP_Query $query = null): string
+    protected function applyFilter(string $filter, array $filterArgs, ?\WP_Query $query = null): string
     {
         /** @var array{\WP_Query, \WP_Query}|null $backup */
         $backup = null;
@@ -141,7 +143,8 @@ class QueryTemplate
             $wp_the_query = $query;
         }
 
-        $filtered = apply_filters($filter, $value);
+        $value = $filterArgs[0] ?? '';
+        $filtered = apply_filters($filter, ...$filterArgs);
         is_string($filtered) and $value = $filtered;
 
         if ($custom && $backup) {
