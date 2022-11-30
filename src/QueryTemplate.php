@@ -84,8 +84,14 @@ class QueryTemplate
         $found = '';
         while ($types && !$found) {
             $type = array_shift($types);
-            $found = $this->finder->findFirst($leaves[$type], (string)$type);
-            $filters and $found = $this->applyFilter("{$type}_template", $found, $query);
+            $templates = $leaves[$type];
+            $found = $this->finder->findFirst($templates, (string) $type);
+            $filters and $found = $this->applyFilter(
+                "{$type}_template",
+                $found,
+                $query,
+                [$type, $templates]
+            );
         }
 
         return $found;
@@ -121,9 +127,10 @@ class QueryTemplate
      * @param string $filter
      * @param string $value
      * @param \WP_Query|null $query
+     * @param array $moreArgs
      * @return string
      */
-    protected function applyFilter(string $filter, string $value, ?\WP_Query $query = null): string
+    protected function applyFilter(string $filter, string $value, ?\WP_Query $query = null, array $moreArgs = []): string
     {
         /** @var array{\WP_Query, \WP_Query}|null $backup */
         $backup = null;
@@ -141,7 +148,7 @@ class QueryTemplate
             $wp_the_query = $query;
         }
 
-        $filtered = apply_filters($filter, $value);
+        $filtered = apply_filters($filter, $value, ...$moreArgs);
         is_string($filtered) and $value = $filtered;
 
         if ($custom && $backup) {

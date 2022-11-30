@@ -146,7 +146,7 @@ class QueryTemplateTest extends TestCase
 
         Filters\expectApplied('foo_template')
             ->once()
-            ->with('found!')
+            ->with(...['found!', 'foo', ['foo', 'bar']])
             ->andReturnUsing(
                 static function () use ($customQuery): string {
                     // during filter, globals `$wp_query` and `$wp_the_query` are equal to custom
